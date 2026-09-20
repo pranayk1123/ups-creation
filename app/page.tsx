@@ -6,7 +6,7 @@ export default function HomePage() {
     { 
       id: 1, 
       name: "Crochet Modak", 
-      price: "₹399", 
+      price: "₹100", 
       desc: "Traditional, handcrafted crochet modak for your festive offerings.", 
       image: "/image1.jpeg", 
       imgPosition: "center 45%" // Pahilya image sathi vegli position
@@ -14,7 +14,7 @@ export default function HomePage() {
     { 
       id: 2, 
       name: "Custom Amigurumi", 
-      price: "₹899", 
+      price: "₹150", 
       desc: "Personalized crochet dolls made with intricate details.", 
       image: "/image2.jpeg", 
       imgPosition: "bottom" // Dusrya image sathi vegli position
@@ -22,7 +22,7 @@ export default function HomePage() {
     { 
       id: 3, 
       name: "Aesthetic Decor", 
-      price: "₹699", 
+      price: "₹200", 
       desc: "Minimalist and warm crochet pieces for home styling.", 
       image: "/image3.jpeg", 
       imgPosition: "center 55%" // Tisrya image sathi vegli position
