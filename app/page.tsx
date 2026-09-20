@@ -1,10 +1,32 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function HomePage() {
   const products = [
-    { id: 1, name: "Crochet Roses", price: "₹499", desc: "Everlasting, delicately handcrafted roses for your loved ones." },
-    { id: 2, name: "Custom Amigurumi", price: "₹899", desc: "Personalized crochet dolls made with intricate details." },
-    { id: 3, name: "Aesthetic Decor", price: "₹699", desc: "Minimalist and warm crochet pieces for home styling." }
+    { 
+      id: 1, 
+      name: "Crochet Modak", 
+      price: "₹399", 
+      desc: "Traditional, handcrafted crochet modak for your festive offerings.", 
+      image: "/image1.jpeg", 
+      imgPosition: "center 45%" // Pahilya image sathi vegli position
+    },
+    { 
+      id: 2, 
+      name: "Custom Amigurumi", 
+      price: "₹899", 
+      desc: "Personalized crochet dolls made with intricate details.", 
+      image: "/image2.jpeg", 
+      imgPosition: "bottom" // Dusrya image sathi vegli position
+    },
+    { 
+      id: 3, 
+      name: "Aesthetic Decor", 
+      price: "₹699", 
+      desc: "Minimalist and warm crochet pieces for home styling.", 
+      image: "/image3.jpeg", 
+      imgPosition: "center 55%" // Tisrya image sathi vegli position
+    }
   ];
 
   return (
@@ -13,7 +35,6 @@ export default function HomePage() {
       <section className="relative flex flex-col items-center justify-center min-h-screen w-full px-4 text-center bg-[#fdf7f7]">
         <div className="absolute inset-0 bg-gradient-to-b from-[#fceceb]/50 to-transparent pointer-events-none"></div>
         
-        {/* Main Content Container - Centered */}
         <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
           <p className="text-sm md:text-base text-[#a35d58] mb-6 tracking-[0.3em] uppercase font-medium">
             Handcrafted in Mumbai
@@ -43,7 +64,19 @@ export default function HomePage() {
             {products.map((product) => (
               <div key={product.id} className="group bg-white rounded-none p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col">
                 <div className="w-full h-80 bg-[#fdf7f7] mb-8 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500">
-                  <span className="text-[#a35d58] text-sm tracking-widest uppercase font-light">Image Preview</span>
+                  
+                  {/* Ithe style madhe tuzyach array madhli imgPosition apply hotiye */}
+                  <Image 
+                    src={product.image} 
+                    alt={product.name} 
+                    layout="fill" 
+                    style={{ 
+                      objectFit: "cover", 
+                      objectPosition: product.imgPosition 
+                    }}
+                    className="transition-transform duration-500 group-hover:scale-105"
+                  />  
+                  
                 </div>
                 
                 <div className="text-center flex-grow">
