@@ -133,7 +133,6 @@ export default function AdminPage() {
   // --- LOGIN SCREEN ---
   if (!isAuthenticated) {
     return (
-      // ITHI BADAL KELA AHE: pt-28 add kela
       <div className="min-h-screen flex items-center justify-center bg-[#fdf7f7] px-4 pt-28">
         <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm flex flex-col gap-5 border border-[#f5e1df]">
           <h2 className="text-3xl font-serif text-[#4a2c2a] text-center mb-2">Admin Login</h2>
@@ -163,7 +162,6 @@ export default function AdminPage() {
 
   // --- ADMIN DASHBOARD ---
   return (
-    // ITHI BADAL KELA AHE: pt-32 add kela
     <div className="min-h-screen bg-[#fdf7f7] pb-10 pt-32 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm border border-[#f5e1df]">
@@ -216,22 +214,34 @@ export default function AdminPage() {
         {isLoading ? (
           <div className="text-center text-[#a35d58] font-bold my-20">Loading products...</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 w-full">
             {products.map((product) => (
-              <div key={product._id} className="group bg-white rounded-xl p-4 shadow-sm border border-[#f5e1df] flex flex-col relative">
+              <div key={product._id} className="group bg-white rounded-none p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col relative">
+                
+                {/* 🗑️ Delete Button: User chya view madhe disnar nahi, pan admin panel madhe card var hover kelyavar disel */}
                 <button 
                   onClick={() => handleDeleteProduct(product._id)}
-                  className="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-md z-10"
+                  className="absolute top-2 right-2 w-8 h-8 bg-red-500/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hover:bg-red-600 shadow-md"
                   title="Delete Product"
                 >
                   ✕
                 </button>
-                <div className="w-full h-48 bg-[#fdf7f7] mb-4 relative rounded-lg overflow-hidden flex items-center justify-center">
-                  <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} />  
+
+                {/* EXACT SAME IMAGE CONTAINER AS HOMEPAGE */}
+                <div className="w-full h-80 bg-[#fdf7f7] mb-8 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500">
+                  <Image 
+                    src={product.image || "/logo.jpg.jpeg"} 
+                    alt={product.name} 
+                    fill 
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }}
+                    className="transition-transform duration-500 group-hover:scale-105"
+                  />  
                 </div>
-                <div className="flex-grow">
-                  <h3 className="text-xl font-serif text-[#4a2c2a] mb-1">{product.name}</h3>
-                  <span className="text-sm font-bold text-[#a35d58]">{product.price || 'No Price'}</span>
+                
+                <div className="text-center flex-grow">
+                  <h3 className="text-2xl font-serif text-[#4a2c2a] mb-1">{product.name}</h3>
+                  <span className="text-xl font-serif text-[#a35d58]">{product.price || 'No Price'}</span>
                 </div>
               </div>
             ))}
