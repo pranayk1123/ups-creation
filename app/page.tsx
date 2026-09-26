@@ -182,9 +182,10 @@ export default function HomePage() {
 // 💬 WhatsApp Enquiry Section with Quick Pills & Conditional Price
 function WhatsAppEnquirySection({ product, currentImage }: { product: ProductType, currentImage: string }) {
   const [customMsg, setCustomMsg] = useState("");
-  const hasValidPrice = product.price && product.price.trim() !== "" && product.price.trim() !== " ";
+  // Boolean() lavlyamule typescript la exact true/false bhetel
+  const hasValidPrice = Boolean(product.price && product.price.trim() !== "" && product.price.trim() !== " ");
   const [includePrice, setIncludePrice] = useState(hasValidPrice);
-
+  
   const handleQuickOptionClick = (optionText: string) => {
     setCustomMsg(prev => (prev ? `${prev}, ${optionText}` : optionText));
   };
