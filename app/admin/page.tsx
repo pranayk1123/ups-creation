@@ -3,13 +3,14 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
+// NAVIN: images?: string[] add kela ahe
 interface ProductType {
   _id: string;
   name: string;
   price: string;
   desc: string;
   image: string;
-  images?: string[]; // Navin Array
+  images?: string[]; 
   imgPosition: string;
 }
 
@@ -25,7 +26,7 @@ export default function AdminPage() {
     name: '', price: '', desc: '', image: '', imgPosition: 'center',
   });
   
-  // NAVIN: Multiple files sathi Array
+  // NAVIN: Multiple files sathi File[] cha Array
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   useEffect(() => {
@@ -72,8 +73,8 @@ export default function AdminPage() {
     }
   };
 
+  // NAVIN: Multiple files select karnyasathi
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // NAVIN: Sagle select kelele photos ghene
     if (e.target.files) {
       setSelectedFiles(Array.from(e.target.files));
       setNewProduct({ ...newProduct, image: '' }); 
@@ -102,12 +103,10 @@ export default function AdminPage() {
       }
     }
 
-    // Jar direct link paste keli asel
     if (newProduct.image.trim() !== '') {
       uploadedUrls.push(newProduct.image.trim());
     }
 
-    // Main thumbnail saathi pahila photo
     const finalImage = uploadedUrls.length > 0 ? uploadedUrls[0] : '/logo.jpg.jpeg';
     const finalPrice = newProduct.price.trim() === '' ? ' ' : newProduct.price;
 
@@ -119,7 +118,7 @@ export default function AdminPage() {
           ...newProduct, 
           price: finalPrice, 
           image: finalImage,
-          images: uploadedUrls // Sagle photos array madhe pathvle
+          images: uploadedUrls // NAVIN: Sagle photos array madhe pathvle
         }),
       });
       if (res.ok) {
@@ -178,7 +177,7 @@ export default function AdminPage() {
                 
                 <div className="flex flex-col gap-2 p-3 bg-white border border-[#eed6d3] rounded-lg">
                   {/* NAVIN: multiple added here */}
-                  <label className="text-sm text-[#6b4441] font-bold">Images (Select Multiple)</label>
+                  <label className="text-sm text-[#6b4441] font-bold">Images (Select Multiple by pressing Ctrl)</label>
                   <input type="file" multiple accept="image/*" onChange={handleFileUpload} className="text-sm text-[#4a2c2a] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#fceceb] file:text-[#a35d58] hover:file:bg-[#eed6d3]" />
                   <div className="text-center text-xs text-[#a35d58] my-1">OR</div>
                   <input type="text" placeholder="Paste single Image URL here..." value={newProduct.image} onChange={(e) => { setNewProduct({...newProduct, image: e.target.value}); setSelectedFiles([]); }} className="p-2 border border-[#eed6d3] rounded text-sm outline-none focus:border-[#a35d58]" />
@@ -217,8 +216,8 @@ export default function AdminPage() {
                 <div className="text-center flex-grow">
                   <h3 className="text-2xl font-serif text-[#4a2c2a] mb-1">{product.name}</h3>
                   <span className="text-xl font-serif text-[#a35d58]">{product.price || 'No Price'}</span>
-                  {/* Photo count label for Admin */}
-                  <p className="text-xs text-gray-400 mt-2">{product.images?.length || 1} photo(s)</p>
+                  {/* NAVIN: Admin la kiti photo ahet te disel */}
+                  <p className="text-xs text-gray-400 mt-2 font-bold">{product.images && product.images.length > 1 ? `${product.images.length} Photos Added` : '1 Photo'}</p>
                 </div>
               </div>
             ))}
