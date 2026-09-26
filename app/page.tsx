@@ -75,6 +75,7 @@ export default function HomePage() {
             <div className="text-center text-[#6b4441] my-20 italic">Products coming soon...</div>
           ) : (
             <div className="flex flex-col items-center w-full mt-10">
+              {/* 📱 MOBILE: grid-cols-2 (Eka row madhe 2 products) */}
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
                 {products.slice(0, visibleCount).map((product) => (
                   <div key={product._id} className="group bg-white rounded-none p-3 sm:p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col">
@@ -121,12 +122,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 🚀 FIXED POPUP MODAL WITH PROPER MOBILE SCROLLING 🚀 */}
+      {/* POPUP MODAL */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-2 sm:p-6 md:p-10">
-          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col md:flex-row relative shadow-2xl overflow-hidden">
+          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-y-auto flex flex-col md:flex-row relative shadow-2xl">
             
-            {/* Close Button */}
             <button 
               onClick={() => setSelectedProduct(null)} 
               className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 w-9 h-9 sm:w-10 sm:h-10 bg-white/90 text-[#4a2c2a] rounded-full flex items-center justify-center hover:bg-[#a35d58] hover:text-white transition-colors shadow-md border border-[#f5e1df]"
@@ -134,13 +134,12 @@ export default function HomePage() {
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             
-            {/* Left Gallery (Fixed width/height, non-scrolling background) */}
-            <div className="w-full md:w-1/2 bg-[#fdf7f7] p-4 sm:p-8 flex flex-col gap-4 flex-shrink-0">
+            {/* Left Gallery */}
+            <div className="w-full md:w-1/2 bg-[#fdf7f7] p-4 sm:p-8 flex flex-col gap-4">
               <div className="w-full aspect-square relative rounded-xl overflow-hidden bg-white border border-[#f5e1df] shadow-sm">
                 <Image src={currentImage} alt={selectedProduct.name} fill className="object-cover" />
               </div>
               
-              {/* Thumbnails Horizontal Scroll */}
               <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
                 {(selectedProduct.images && selectedProduct.images.length > 0 
                   ? selectedProduct.images 
@@ -157,9 +156,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Details with Proper Vertical Scrolling (overflow-y-auto added here) */}
-            <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col bg-white overflow-y-auto max-h-[92vh]">
-              <div className="mb-4">
+            {/* Right Details */}
+            <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col justify-between bg-white">
+              <div>
                 <p className="text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase text-[#a35d58] mb-1 sm:mb-2">UP's Creation</p>
                 <h2 className="text-2xl sm:text-4xl md:text-5xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 leading-tight">{selectedProduct.name}</h2>
                 <p className="text-xl sm:text-3xl font-serif text-[#a35d58] mb-4">{selectedProduct.price}</p>
@@ -167,10 +166,9 @@ export default function HomePage() {
                 <div className="w-full h-[1px] bg-[#f5e1df] mb-4"></div>
                 
                 <h4 className="text-xs sm:text-sm font-bold text-[#4a2c2a] uppercase tracking-wider mb-1">Product Description</h4>
-                <p className="text-[#6b4441] leading-relaxed mb-4 whitespace-pre-wrap font-light text-xs sm:text-sm">{selectedProduct.desc}</p>
+                <p className="text-[#6b4441] leading-relaxed mb-4 whitespace-pre-wrap font-light text-xs sm:text-sm line-clamp-4">{selectedProduct.desc}</p>
               </div>
 
-              {/* WhatsApp Enquiry Section */}
               <WhatsAppEnquirySection product={selectedProduct} currentImage={currentImage} />
             </div>
 
@@ -213,7 +211,7 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
   };
 
   return (
-    <div className="bg-[#fdf7f7] p-4 rounded-xl border border-[#f5e1df] flex flex-col gap-3 mt-auto">
+    <div className="bg-[#fdf7f7] p-4 rounded-xl border border-[#f5e1df] flex flex-col gap-3 mt-4">
       <h4 className="text-xs font-bold text-[#4a2c2a] uppercase tracking-wider">Enquire via WhatsApp</h4>
       
       {hasValidPrice && (
