@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
-// NAVIN: images?: string[] add kela ahe
 interface ProductType {
   _id: string;
   name: string;
@@ -26,7 +25,6 @@ export default function AdminPage() {
     name: '', price: '', desc: '', image: '', imgPosition: 'center',
   });
   
-  // NAVIN: Multiple files sathi File[] cha Array
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   useEffect(() => {
@@ -73,7 +71,6 @@ export default function AdminPage() {
     }
   };
 
-  // NAVIN: Multiple files select karnyasathi
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setSelectedFiles(Array.from(e.target.files));
@@ -86,7 +83,6 @@ export default function AdminPage() {
     
     let uploadedUrls: string[] = [];
 
-    // NAVIN: Ek-ek karun sagle photos upload karne
     if (selectedFiles.length > 0) {
       for (const file of selectedFiles) {
         const formData = new FormData();
@@ -118,7 +114,7 @@ export default function AdminPage() {
           ...newProduct, 
           price: finalPrice, 
           image: finalImage,
-          images: uploadedUrls // NAVIN: Sagle photos array madhe pathvle
+          images: uploadedUrls 
         }),
       });
       if (res.ok) {
@@ -176,7 +172,6 @@ export default function AdminPage() {
                 <input type="text" placeholder="Price (Optional)" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]" />
                 
                 <div className="flex flex-col gap-2 p-3 bg-white border border-[#eed6d3] rounded-lg">
-                  {/* NAVIN: multiple added here */}
                   <label className="text-sm text-[#6b4441] font-bold">Images (Select Multiple by pressing Ctrl)</label>
                   <input type="file" multiple accept="image/*" onChange={handleFileUpload} className="text-sm text-[#4a2c2a] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#fceceb] file:text-[#a35d58] hover:file:bg-[#eed6d3]" />
                   <div className="text-center text-xs text-[#a35d58] my-1">OR</div>
@@ -210,13 +205,26 @@ export default function AdminPage() {
             {products.map((product) => (
               <div key={product._id} className="group bg-white rounded-none p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col relative">
                 <button onClick={() => handleDeleteProduct(product._id)} className="absolute top-2 right-2 w-8 h-8 bg-red-500/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hover:bg-red-600 shadow-md">✕</button>
-                <div className="w-full h-80 bg-[#fdf7f7] mb-8 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500">
+                
+                {/* Main Image */}
+                <div className="w-full h-80 bg-[#fdf7f7] mb-4 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500">
                   <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
                 </div>
+
+                {/* 📸 NAVIN: Admin panel var sagle uploaded photos chote thumbnails madhe distil */}
+                {product.images && product.images.length > 1 && (
+                  <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+                    {product.images.map((imgUrl, i) => (
+                      <div key={i} className="relative w-12 h-12 flex-shrink-0 rounded border border-[#eed6d3] overflow-hidden bg-[#fdf7f7]">
+                        <Image src={imgUrl} alt={`Thumb ${i}`} fill className="object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div className="text-center flex-grow">
                   <h3 className="text-2xl font-serif text-[#4a2c2a] mb-1">{product.name}</h3>
                   <span className="text-xl font-serif text-[#a35d58]">{product.price || 'No Price'}</span>
-                  {/* NAVIN: Admin la kiti photo ahet te disel */}
                   <p className="text-xs text-gray-400 mt-2 font-bold">{product.images && product.images.length > 1 ? `${product.images.length} Photos Added` : '1 Photo'}</p>
                 </div>
               </div>
