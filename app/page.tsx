@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -105,12 +105,12 @@ export default function HomePage() {
 
   return (
     <div className="overflow-hidden w-full relative selection:bg-[#fceceb] selection:text-[#a35d58]">
-<section className="relative flex flex-col items-center justify-center min-h-screen w-full px-4 text-center bg-[#fdf7f7] overflow-hidden">
+      <section className="relative flex flex-col items-center justify-center min-h-screen w-full px-4 text-center bg-[#fdf7f7] overflow-hidden">
         {/* Soft Ambient Background Glow */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#fceceb]/60 via-transparent to-transparent pointer-events-none"></div>
-        
+
         <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center space-y-6">
-          
+
           {/* Subtitle with Smooth Slide Down */}
           <div className="overflow-hidden">
             <p className="text-xs md:text-sm text-[#a35d58] tracking-[0.35em] uppercase font-semibold transform transition-all duration-1000 animate-fade-in-down">
@@ -121,7 +121,7 @@ export default function HomePage() {
           {/* Main Title with Elegant Fade & Subtle Scale */}
           <div className="overflow-hidden">
             <h1 className="text-6xl md:text-8xl font-serif text-[#4a2c2a] leading-tight transform transition-all duration-1000 animate-fade-in-up">
-              Handmade <br/> 
+              Handmade <br />
               <span className="italic text-[#a35d58] font-light inline-block hover:scale-105 transition-transform duration-500 cursor-default">
                 with Love
               </span>
@@ -135,8 +135,8 @@ export default function HomePage() {
 
           {/* Luxury Hover Button with Smooth Shadow Lift */}
           <div className="pt-6 animate-fade-in delay-300">
-            <Link 
-              href="#products" 
+            <Link
+              href="#products"
               className="group relative inline-flex items-center justify-center px-10 py-4 bg-[#4a2c2a] text-[#fdf7f7] text-xs tracking-[0.25em] uppercase font-medium rounded-full overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
             >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#a35d58] to-[#4a2c2a] opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"></span>
@@ -184,6 +184,13 @@ export default function HomePage() {
                       className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-4 sm:mb-8 relative overflow-hidden rounded-lg flex items-center justify-center group-hover:bg-[#fceceb] transition-all duration-500 cursor-pointer"
                     >
                       <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-700 ease-out group-hover:scale-105" />
+
+                      {/* 🏷️ CHHOTA TRANSPARENT WATERMARK LOGO ON TOP-LEFT */}
+                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 w-7 h-7 sm:w-9 sm:h-9 rounded-full overflow-hidden border border-white/40 shadow-sm opacity-75 backdrop-blur-md pointer-events-none">
+                        <Image src="/logo.jpg.jpeg" alt="UP's Creation Logo" fill className="object-cover" />
+                      </div>
+
+                      {/* Multiple Images Count Badge */}
                       {product.images && product.images.length > 1 && (
                         <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/90 backdrop-blur-md text-[10px] sm:text-xs font-bold text-[#4a2c2a] px-2 py-0.5 sm:py-1 rounded-full flex gap-1 items-center shadow-sm">
                           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
