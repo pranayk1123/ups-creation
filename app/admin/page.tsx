@@ -22,7 +22,6 @@ export default function AdminPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
-  // 📝 EDIT STATE: Jar product edit karaycha asel tar ithe data store hoil
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState({
     name: '', price: '', desc: '', image: '', imgPosition: 'center',
@@ -53,7 +52,7 @@ export default function AdminPage() {
         alert("Wrong Username or Password! Please try again.");
       }
     } catch (error) {
-      console.error("Login madhe problem aala:", error);
+      console.error("Login error:", error);
     }
   };
 
@@ -69,7 +68,7 @@ export default function AdminPage() {
       if (Array.isArray(data)) setProducts(data);
       setIsLoading(false);
     } catch (error) {
-      console.error("Products anayla problem aala:", error);
+      console.error("Fetch products error:", error);
       setIsLoading(false);
     }
   };
@@ -81,7 +80,6 @@ export default function AdminPage() {
     }
   };
 
-  // ✏️ Open form for Editing
   const handleOpenEdit = (product: ProductType) => {
     setEditingProductId(product._id);
     setNewProduct({
@@ -96,7 +94,6 @@ export default function AdminPage() {
     setIsFormOpen(true);
   };
 
-  // 🗑️ Delete specific image from current list while editing/adding
   const handleRemoveExistingImage = (indexToRemove: number) => {
     setCurrentImages(currentImages.filter((_, idx) => idx !== indexToRemove));
   };
@@ -106,7 +103,6 @@ export default function AdminPage() {
     
     let uploadedUrls = [...currentImages];
 
-    // Upload newly selected files
     if (selectedFiles.length > 0) {
       for (const file of selectedFiles) {
         const formData = new FormData();
@@ -118,7 +114,7 @@ export default function AdminPage() {
             uploadedUrls.push(uploadData.url);
           }
         } catch (error) {
-          console.error("Photo upload fail zala:", error);
+          console.error("Photo upload failed:", error);
         }
       }
     }
@@ -154,18 +150,18 @@ export default function AdminPage() {
         setSelectedFiles([]);
       }
     } catch (error) {
-      console.error("Product save kartana error aala:", error);
+      console.error("Error saving product:", error);
     }
   };
 
   const handleDeleteProduct = async (id: string) => {
-    const confirmDelete = window.confirm("Nakkich ha product delete karaycha ahe ka?");
+    const confirmDelete = window.confirm("Are you sure you want to delete this product?");
     if (!confirmDelete) return;
     try {
       const res = await fetch(`/api/products?id=${id}`, { method: 'DELETE' });
       if (res.ok) fetchProducts();
     } catch (error) {
-      console.error("Product delete kartana problem aala:", error);
+      console.error("Error deleting product:", error);
     }
   };
 
@@ -183,32 +179,33 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fdf7f7] pb-10 pt-32 px-6">
+    <div className="min-h-screen bg-[#fdf7f7] pb-10 pt-28 sm:pt-32 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm border border-[#f5e1df]">
-          <h1 className="text-3xl font-serif text-[#4a2c2a]">Admin Dashboard</h1>
-          <div className="flex gap-4">
+        
+        {/* 📱 RESPONSIVE ADMIN HEADER */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 sm:mb-10 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-[#f5e1df]">
+          <h1 className="text-2xl sm:text-3xl font-serif text-[#4a2c2a]">Admin Dashboard</h1>
+          <div className="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
             <button onClick={() => { 
               setEditingProductId(null);
               setNewProduct({ name: '', price: '', desc: '', image: '', imgPosition: 'center' });
               setCurrentImages([]);
               setSelectedFiles([]);
               setIsFormOpen(true); 
-            }} className="px-6 py-2 bg-[#a35d58] text-white rounded-full font-bold uppercase tracking-widest text-sm shadow-md hover:bg-[#4a2c2a] transition-all">+ Add Product</button>
-            <button onClick={handleLogout} className="px-6 py-2 bg-transparent text-[#4a2c2a] border border-[#4a2c2a] rounded-full font-bold uppercase tracking-widest text-sm hover:bg-[#fceceb] transition-all">Logout</button>
+            }} className="flex-1 sm:flex-none px-5 py-2.5 bg-[#a35d58] text-white rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm shadow-md hover:bg-[#4a2c2a] transition-all text-center">+ Add Product</button>
+            <button onClick={handleLogout} className="flex-1 sm:flex-none px-5 py-2.5 bg-transparent text-[#4a2c2a] border border-[#4a2c2a] rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm hover:bg-[#fceceb] transition-all text-center">Logout</button>
           </div>
         </div>
 
         {/* ADD / EDIT MODAL FORM */}
         {isFormOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-            <div className="bg-[#fdf7f7] p-8 rounded-2xl shadow-2xl max-w-md w-full border border-[#f5e1df] max-h-[90vh] overflow-y-auto mt-20">
+            <div className="bg-[#fdf7f7] p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md w-full border border-[#f5e1df] max-h-[90vh] overflow-y-auto mt-10">
               <h3 className="text-2xl font-serif text-[#4a2c2a] mb-6 text-center">{editingProductId ? 'Edit Creation' : 'Add New Creation'}</h3>
               <form onSubmit={handleSaveProduct} className="flex flex-col gap-4">
                 <input type="text" placeholder="Product Name" required value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]" />
                 <input type="text" placeholder="Price (Optional)" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]" />
                 
-                {/* Existing Images preview with Delete option */}
                 {currentImages.length > 0 && (
                   <div className="flex flex-col gap-1">
                     <label className="text-xs text-[#6b4441] font-bold">Current Photos (Click ✕ to remove)</label>
@@ -240,8 +237,8 @@ export default function AdminPage() {
                   <label className="text-sm text-[#6b4441] font-bold">Main Image Display Adjust</label>
                   <select value={newProduct.imgPosition} onChange={(e) => setNewProduct({...newProduct, imgPosition: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]">
                     <option value="center">Center (Default)</option>
-                    <option value="top">Top (Varcha bhag dakhava)</option>
-                    <option value="bottom">Bottom (Khalcha bhag dakhava)</option>
+                    <option value="top">Top</option>
+                    <option value="bottom">Bottom</option>
                   </select>
                 </div>
 
@@ -256,10 +253,11 @@ export default function AdminPage() {
           </div>
         )}
         
+        {/* 📱 2-COLUMN GRID FOR MOBILE, 3-COLUMN FOR DESKTOP */}
         {isLoading ? (
           <div className="text-center text-[#a35d58] font-bold my-20">Loading products...</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 w-full">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
             {products.map((product) => (
               <AdminProductCard key={product._id} product={product} handleDeleteProduct={handleDeleteProduct} handleOpenEdit={handleOpenEdit} />
             ))}
@@ -270,36 +268,34 @@ export default function AdminPage() {
   );
 }
 
-// Separate component for product card with Edit & Delete actions
+// 📱 Admin Product Card (Optimized for Mobile Grid)
 function AdminProductCard({ product, handleDeleteProduct, handleOpenEdit }: { product: ProductType, handleDeleteProduct: (id: string) => void, handleOpenEdit: (p: ProductType) => void }) {
   const [activeImage, setActiveImage] = useState(product.image || "/logo.jpg.jpeg");
 
   return (
-    <div className="group bg-white rounded-none p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col relative">
-      <div className="absolute top-2 right-2 flex gap-2 z-20">
-        {/* ✏️ Edit Button */}
-        <button onClick={() => handleOpenEdit(product)} className="w-8 h-8 bg-[#4a2c2a] text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#a35d58] shadow-md" title="Edit Product">
+    <div className="group bg-white rounded-none p-3 sm:p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col relative">
+      <div className="absolute top-2 right-2 flex gap-1.5 z-20">
+        <button onClick={() => handleOpenEdit(product)} className="w-7 h-7 sm:w-8 sm:h-8 bg-[#4a2c2a] text-white rounded-full flex items-center justify-center sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#a35d58] shadow-md text-xs" title="Edit Product">
           ✎
         </button>
-        {/* ✕ Delete Button */}
-        <button onClick={() => handleDeleteProduct(product._id)} className="w-8 h-8 bg-red-500/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-600 shadow-md" title="Delete Product">
+        <button onClick={() => handleDeleteProduct(product._id)} className="w-7 h-7 sm:w-8 sm:h-8 bg-red-500/90 text-white rounded-full flex items-center justify-center sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-600 shadow-md text-xs" title="Delete Product">
           ✕
         </button>
       </div>
       
       {/* Main Image */}
-      <div className="w-full h-80 bg-[#fdf7f7] mb-4 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500">
-        <Image src={activeImage} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
+      <div className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-3 sm:mb-4 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500">
+        <Image src={activeImage} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
       </div>
 
       {/* Thumbnails */}
       {product.images && product.images.length > 1 && (
-        <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+        <div className="flex gap-1.5 sm:gap-2 mb-3 sm:mb-4 overflow-x-auto pb-1 scrollbar-thin">
           {product.images.map((imgUrl, i) => (
             <div 
               key={i} 
               onClick={() => setActiveImage(imgUrl)}
-              className={`relative w-12 h-12 flex-shrink-0 rounded border-2 overflow-hidden bg-[#fdf7f7] cursor-pointer transition-all ${activeImage === imgUrl ? 'border-[#a35d58] scale-105 shadow-md' : 'border-[#eed6d3] opacity-70 hover:opacity-100'}`}
+              className={`relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded border-2 overflow-hidden bg-[#fdf7f7] cursor-pointer transition-all ${activeImage === imgUrl ? 'border-[#a35d58] scale-105 shadow-md' : 'border-[#eed6d3] opacity-70 hover:opacity-100'}`}
             >
               <Image src={imgUrl} alt={`Thumb ${i}`} fill className="object-cover" />
             </div>
@@ -308,9 +304,9 @@ function AdminProductCard({ product, handleDeleteProduct, handleOpenEdit }: { pr
       )}
 
       <div className="text-center flex-grow">
-        <h3 className="text-2xl font-serif text-[#4a2c2a] mb-1">{product.name}</h3>
-        <span className="text-xl font-serif text-[#a35d58]">{product.price || 'No Price'}</span>
-        <p className="text-xs text-gray-400 mt-2 font-bold">{product.images && product.images.length > 1 ? `${product.images.length} Photos Added` : '1 Photo'}</p>
+        <h3 className="text-base sm:text-2xl font-serif text-[#4a2c2a] mb-1 line-clamp-1">{product.name}</h3>
+        <span className="text-sm sm:text-xl font-serif text-[#a35d58]">{product.price || 'No Price'}</span>
+        <p className="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2 font-bold">{product.images && product.images.length > 1 ? `${product.images.length} Photos` : '1 Photo'}</p>
       </div>
     </div>
   );
