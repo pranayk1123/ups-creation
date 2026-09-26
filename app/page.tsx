@@ -251,6 +251,13 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
         >
           ⏱️ Delivery Time?
         </button>
+        <button 
+          type="button" 
+          onClick={() => handleQuickOptionClick("What is the Price?")}
+          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
+        >
+          ⏱️ Price?
+        </button>
       </div>
 
       <textarea 
