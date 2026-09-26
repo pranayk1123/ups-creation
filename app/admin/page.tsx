@@ -203,34 +203,47 @@ export default function AdminPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 w-full">
             {products.map((product) => (
-              <div key={product._id} className="group bg-white rounded-none p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col relative">
-                <button onClick={() => handleDeleteProduct(product._id)} className="absolute top-2 right-2 w-8 h-8 bg-red-500/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hover:bg-red-600 shadow-md">✕</button>
-                
-                {/* Main Image */}
-                <div className="w-full h-80 bg-[#fdf7f7] mb-4 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500">
-                  <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
-                </div>
-
-                {/* 📸 NAVIN: Admin panel var sagle uploaded photos chote thumbnails madhe distil */}
-                {product.images && product.images.length > 1 && (
-                  <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-                    {product.images.map((imgUrl, i) => (
-                      <div key={i} className="relative w-12 h-12 flex-shrink-0 rounded border border-[#eed6d3] overflow-hidden bg-[#fdf7f7]">
-                        <Image src={imgUrl} alt={`Thumb ${i}`} fill className="object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="text-center flex-grow">
-                  <h3 className="text-2xl font-serif text-[#4a2c2a] mb-1">{product.name}</h3>
-                  <span className="text-xl font-serif text-[#a35d58]">{product.price || 'No Price'}</span>
-                  <p className="text-xs text-gray-400 mt-2 font-bold">{product.images && product.images.length > 1 ? `${product.images.length} Photos Added` : '1 Photo'}</p>
-                </div>
-              </div>
+              <AdminProductCard key={product._id} product={product} handleDeleteProduct={handleDeleteProduct} />
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// Separate component to handle independent active image state for each product card
+function AdminProductCard({ product, handleDeleteProduct }: { product: ProductType, handleDeleteProduct: (id: string) => void }) {
+  const [activeImage, setActiveImage] = useState(product.image || "/logo.jpg.jpeg");
+
+  return (
+    <div className="group bg-white rounded-none p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col relative">
+      <button onClick={() => handleDeleteProduct(product._id)} className="absolute top-2 right-2 w-8 h-8 bg-red-500/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hover:bg-red-600 shadow-md">✕</button>
+      
+      {/* Main Image */}
+      <div className="w-full h-80 bg-[#fdf7f7] mb-4 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500">
+        <Image src={activeImage} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
+      </div>
+
+      {/* Thumbnails - Clicking changes the activeImage */}
+      {product.images && product.images.length > 1 && (
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+          {product.images.map((imgUrl, i) => (
+            <div 
+              key={i} 
+              onClick={() => setActiveImage(imgUrl)}
+              className={`relative w-12 h-12 flex-shrink-0 rounded border-2 overflow-hidden bg-[#fdf7f7] cursor-pointer transition-all ${activeImage === imgUrl ? 'border-[#a35d58] scale-105 shadow-md' : 'border-[#eed6d3] opacity-70 hover:opacity-100'}`}
+            >
+              <Image src={imgUrl} alt={`Thumb ${i}`} fill className="object-cover" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="text-center flex-grow">
+        <h3 className="text-2xl font-serif text-[#4a2c2a] mb-1">{product.name}</h3>
+        <span className="text-xl font-serif text-[#a35d58]">{product.price || 'No Price'}</span>
+        <p className="text-xs text-gray-400 mt-2 font-bold">{product.images && product.images.length > 1 ? `${product.images.length} Photos Added` : '1 Photo'}</p>
       </div>
     </div>
   );
