@@ -37,7 +37,7 @@ export default function Navbar() {
         </h2>
       </Link>
 
-      {/* 2. Center: Links Capsule */}
+      {/* 2. Center: Links Capsule (Desktop) */}
       <div className="hidden md:flex items-center gap-8 bg-[#4a2c2a]/10 backdrop-blur-md px-10 py-3 rounded-full border border-white/40 shadow-sm relative right-4 lg:right-16">
         <Link href="/" className="text-[#4a2c2a] hover:text-[#a35d58] text-xs tracking-widest uppercase font-bold transition-colors">
           Home
@@ -79,16 +79,37 @@ export default function Navbar() {
           </svg>
         </button>
 
-        {/* Dropdown Menu - Open zalyavar disel */}
+        {/* Dropdown Menu - Open zalyavar disel (Both Mobile & Desktop) */}
         {isMenuOpen && (
-          <div className="absolute right-0 top-full mt-3 flex flex-col bg-white border border-[#eed6d3] rounded-xl shadow-xl overflow-hidden w-44 z-50">
+          <div className="absolute right-0 top-full mt-3 flex flex-col bg-white border border-[#eed6d3] rounded-xl shadow-xl overflow-hidden w-48 z-50 py-1">
+            <Link 
+              href="/" 
+              onClick={() => setIsMenuOpen(false)}
+              className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#4a2c2a] hover:bg-[#fceceb] hover:text-[#a35d58] transition-colors md:hidden"
+            >
+              Home
+            </Link>
+            <Link 
+              href="#products" 
+              onClick={() => setIsMenuOpen(false)}
+              className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#4a2c2a] hover:bg-[#fceceb] hover:text-[#a35d58] transition-colors md:hidden"
+            >
+              Collection
+            </Link>
+            <Link 
+              href="#contact" 
+              onClick={() => setIsMenuOpen(false)}
+              className="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#4a2c2a] hover:bg-[#fceceb] hover:text-[#a35d58] transition-colors md:hidden"
+            >
+              Contact
+            </Link>
+            <div className="w-full h-[1px] bg-[#f5e1df] my-1 md:hidden"></div>
             <Link 
               href="/admin" 
-              onClick={() => setIsMenuOpen(false)} // Click kelyavar band hoil
+              onClick={() => setIsMenuOpen(false)} 
               className="px-5 py-3 text-sm font-bold text-[#4a2c2a] hover:bg-[#fceceb] hover:text-[#a35d58] transition-colors flex items-center justify-between"
             >
               Admin Panel
-              {/* Ek chota Lock cha icon taklay professional disnyasathi */}
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#a35d58]">
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
