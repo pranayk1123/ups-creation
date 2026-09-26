@@ -37,7 +37,7 @@ export default function HomePage() {
     fetchProducts();
   }, []);
 
-  // 🔙 MOBILE BACK BUTTON FIX: Back button dablyavar purna page refresh honya aivaji fakt popup band hoil
+  // 🔙 MOBILE BACK BUTTON FIX
   useEffect(() => {
     const handlePopState = () => {
       if (selectedProduct) {
@@ -126,8 +126,18 @@ export default function HomePage() {
             <div className="w-16 h-[1px] bg-[#a35d58] mx-auto mb-10"></div>
           </div>
 
+          {/* 🌟 AMAZON & YOUTUBE STYLE SKELETON LOADING EFFECT */}
           {isLoading ? (
-            <div className="text-center text-[#a35d58] font-bold my-20">Loading products...</div>
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div key={n} className="bg-white p-3 sm:p-6 border border-[#f5e1df] flex flex-col animate-pulse">
+                  <div className="w-full h-44 sm:h-80 bg-gray-200 mb-4 sm:mb-8 rounded-none"></div>
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto mb-3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-5/6 mx-auto mb-6"></div>
+                  <div className="h-10 bg-gray-200 rounded w-full mt-auto"></div>
+                </div>
+              ))}
+            </div>
           ) : products.length === 0 ? (
             <div className="text-center text-[#6b4441] my-20 italic">Products coming soon...</div>
           ) : (
@@ -178,7 +188,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* POPUP MODAL (FIXED SCROLL & HEIGHT FOR MOBILE) */}
+      {/* POPUP MODAL */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-2 sm:p-6 md:p-10">
           <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col md:flex-row relative shadow-2xl overflow-y-auto md:overflow-hidden">
@@ -198,7 +208,6 @@ export default function HomePage() {
                 onTouchEnd={onTouchEnd}
                 className="w-full aspect-square relative rounded-xl overflow-hidden bg-white border border-[#f5e1df] shadow-sm cursor-grab active:cursor-grabbing"
               >
-                {/* 🛒 Amazon Style Sliding Track */}
                 <div
                   className="flex h-full transition-transform duration-300 ease-out"
                   style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
@@ -210,7 +219,6 @@ export default function HomePage() {
                   ))}
                 </div>
 
-                {/* Chhota Number Badge (1/3) */}
                 {imagesList.length > 1 && (
                   <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[9px] font-medium px-1.5 py-0.5 rounded-full pointer-events-none md:hidden shadow-sm z-10 tracking-widest">
                     {currentImageIndex + 1} / {imagesList.length}
@@ -218,7 +226,6 @@ export default function HomePage() {
                 )}
               </div>
 
-              {/* Thumbnails Horizontal Scroll */}
               <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
                 {imagesList.map((img, idx) => (
                   <button
@@ -232,7 +239,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Details with smooth vertical scroll */}
+            {/* Right Details */}
             <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col bg-white md:overflow-y-auto md:max-h-[92vh]">
               <div className="mb-4">
                 <p className="text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase text-[#a35d58] mb-1 sm:mb-2">UP's Creation</p>
@@ -256,7 +263,7 @@ export default function HomePage() {
   );
 }
 
-// 💬 WhatsApp Enquiry Section with Quick Pills & Conditional Price
+// 💬 WhatsApp Enquiry Section
 function WhatsAppEnquirySection({ product, currentImage }: { product: ProductType, currentImage: string }) {
   const [customMsg, setCustomMsg] = useState("");
   const hasValidPrice = Boolean(product.price && product.price.trim() !== "" && product.price.trim() !== " ");
