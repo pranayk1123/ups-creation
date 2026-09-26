@@ -1,4 +1,4 @@
-"use client";
+"use client"; 
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -104,18 +104,51 @@ export default function HomePage() {
   };
 
   return (
-    <div className="overflow-hidden w-full relative">
-      <section className="relative flex flex-col items-center justify-center min-h-screen w-full px-4 text-center bg-[#fdf7f7]">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#fceceb]/50 to-transparent pointer-events-none"></div>
-        <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
-          <p className="text-sm md:text-base text-[#a35d58] mb-6 tracking-[0.3em] uppercase font-medium">Handcrafted in Mumbai</p>
-          <h1 className="text-6xl md:text-8xl font-serif text-[#4a2c2a] mb-8 leading-tight">Handmade <br /> <span className="italic text-[#a35d58]">with Love</span></h1>
-          <p className="text-lg text-[#6b4441] mb-12 max-w-xl mx-auto leading-relaxed font-light">
+    <div className="overflow-hidden w-full relative selection:bg-[#fceceb] selection:text-[#a35d58]">
+<section className="relative flex flex-col items-center justify-center min-h-screen w-full px-4 text-center bg-[#fdf7f7] overflow-hidden">
+        {/* Soft Ambient Background Glow */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#fceceb]/60 via-transparent to-transparent pointer-events-none"></div>
+        
+        <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center space-y-6">
+          
+          {/* Subtitle with Smooth Slide Down */}
+          <div className="overflow-hidden">
+            <p className="text-xs md:text-sm text-[#a35d58] tracking-[0.35em] uppercase font-semibold transform transition-all duration-1000 animate-fade-in-down">
+              Handcrafted in Mumbai
+            </p>
+          </div>
+
+          {/* Main Title with Elegant Fade & Subtle Scale */}
+          <div className="overflow-hidden">
+            <h1 className="text-6xl md:text-8xl font-serif text-[#4a2c2a] leading-tight transform transition-all duration-1000 animate-fade-in-up">
+              Handmade <br/> 
+              <span className="italic text-[#a35d58] font-light inline-block hover:scale-105 transition-transform duration-500 cursor-default">
+                with Love
+              </span>
+            </h1>
+          </div>
+
+          {/* Description with Soft Fade */}
+          <p className="text-base md:text-lg text-[#6b4441] max-w-xl mx-auto leading-relaxed font-light opacity-85 pt-2 animate-fade-in delay-200">
             Discover our premium collection of crochet artistry, bespoke gifts, and elegant home decor. Stitched meticulously for your special moments.
           </p>
-          <Link href="#products" className="px-10 py-4 bg-[#4a2c2a] text-[#fdf7f7] text-sm tracking-widest uppercase font-medium hover:bg-[#a35d58] transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1">
-            Explore Collection
-          </Link>
+
+          {/* Luxury Hover Button with Smooth Shadow Lift */}
+          <div className="pt-6 animate-fade-in delay-300">
+            <Link 
+              href="#products" 
+              className="group relative inline-flex items-center justify-center px-10 py-4 bg-[#4a2c2a] text-[#fdf7f7] text-xs tracking-[0.25em] uppercase font-medium rounded-full overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
+            >
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#a35d58] to-[#4a2c2a] opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"></span>
+              <span className="relative z-10 flex items-center gap-2">
+                Explore Collection
+                <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+              </span>
+            </Link>
+          </div>
+
         </div>
       </section>
 
@@ -123,18 +156,18 @@ export default function HomePage() {
         <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-16 w-full flex flex-col items-center">
             <h2 className="text-4xl md:text-5xl font-serif text-[#4a2c2a] mb-4">Our Signature Collection</h2>
-            <div className="w-16 h-[1px] bg-[#a35d58] mx-auto mb-10"></div>
+            <div className="w-16 h-[1px] bg-[#a35d58] mx-auto mb-10 transition-all duration-500 hover:w-28"></div>
           </div>
 
-          {/* 🌟 AMAZON & YOUTUBE STYLE SKELETON LOADING EFFECT */}
+          {/* SKELETON LOADING EFFECT */}
           {isLoading ? (
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
               {[1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} className="bg-white p-3 sm:p-6 border border-[#f5e1df] flex flex-col animate-pulse">
-                  <div className="w-full h-44 sm:h-80 bg-gray-200 mb-4 sm:mb-8 rounded-none"></div>
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mx-auto mb-3"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6 mx-auto mb-6"></div>
-                  <div className="h-10 bg-gray-200 rounded w-full mt-auto"></div>
+                <div key={n} className="bg-white p-3 sm:p-6 border border-[#f5e1df] flex flex-col animate-pulse rounded-xl">
+                  <div className="w-full h-44 sm:h-80 bg-[#fceceb]/40 mb-4 sm:mb-8 rounded-lg"></div>
+                  <div className="h-6 bg-[#fceceb]/50 rounded w-3/4 mx-auto mb-3"></div>
+                  <div className="h-4 bg-[#fceceb]/40 rounded w-5/6 mx-auto mb-6"></div>
+                  <div className="h-10 bg-[#fceceb]/40 rounded-full w-full mt-auto"></div>
                 </div>
               ))}
             </div>
@@ -144,15 +177,15 @@ export default function HomePage() {
             <div className="flex flex-col items-center w-full mt-10">
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
                 {products.slice(0, visibleCount).map((product) => (
-                  <div key={product._id} className="group bg-white rounded-none p-3 sm:p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col">
+                  <div key={product._id} className="group bg-white rounded-xl p-3 sm:p-6 shadow-sm hover:shadow-xl transition-all duration-500 border border-[#f5e1df] flex flex-col hover:-translate-y-1.5">
 
                     <div
                       onClick={() => openProductDetails(product)}
-                      className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-4 sm:mb-8 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500 cursor-pointer"
+                      className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-4 sm:mb-8 relative overflow-hidden rounded-lg flex items-center justify-center group-hover:bg-[#fceceb] transition-all duration-500 cursor-pointer"
                     >
-                      <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />
+                      <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-700 ease-out group-hover:scale-105" />
                       {product.images && product.images.length > 1 && (
-                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/80 backdrop-blur-sm text-[10px] sm:text-xs font-bold text-[#4a2c2a] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full flex gap-1 items-center shadow-sm">
+                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/90 backdrop-blur-md text-[10px] sm:text-xs font-bold text-[#4a2c2a] px-2 py-0.5 sm:py-1 rounded-full flex gap-1 items-center shadow-sm">
                           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                           {product.images.length}
                         </div>
@@ -160,7 +193,7 @@ export default function HomePage() {
                     </div>
 
                     <div className="text-center flex-grow">
-                      <h3 className="text-lg sm:text-2xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 line-clamp-1">{product.name}</h3>
+                      <h3 className="text-lg sm:text-2xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 line-clamp-1 group-hover:text-[#a35d58] transition-colors">{product.name}</h3>
                       <p className="text-[#6b4441] text-xs sm:text-sm font-light leading-relaxed mb-4 sm:mb-6 px-1 sm:px-4 mx-auto line-clamp-2">{product.desc}</p>
                     </div>
                     <div className="flex flex-col items-center pt-3 sm:pt-4 border-t border-[#f5e1df]">
@@ -169,7 +202,7 @@ export default function HomePage() {
                       )}
                       <button
                         onClick={() => openProductDetails(product)}
-                        className="w-full py-2 sm:py-3 bg-transparent text-[#4a2c2a] text-[11px] sm:text-sm tracking-widest uppercase border border-[#4a2c2a] hover:bg-[#4a2c2a] hover:text-white transition-all duration-300"
+                        className="w-full py-2.5 sm:py-3 bg-transparent text-[#4a2c2a] text-[11px] sm:text-sm tracking-widest uppercase rounded-full border border-[#4a2c2a] hover:bg-[#4a2c2a] hover:text-white transition-all duration-300 shadow-sm"
                       >
                         View Details
                       </button>
@@ -179,7 +212,7 @@ export default function HomePage() {
               </div>
 
               {visibleCount < products.length && (
-                <button onClick={handleShowMore} className="mt-16 px-10 py-3 bg-transparent text-[#a35d58] border-2 border-[#a35d58] text-sm tracking-widest uppercase font-bold hover:bg-[#a35d58] hover:text-white transition-all duration-300 shadow-sm">
+                <button onClick={handleShowMore} className="mt-16 px-10 py-3.5 bg-transparent text-[#a35d58] border-2 border-[#a35d58] text-sm tracking-widest uppercase rounded-full font-bold hover:bg-[#a35d58] hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg">
                   Show More Products
                 </button>
               )}
@@ -188,14 +221,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* POPUP MODAL */}
+      {/* POPUP MODAL WITH SMOOTH ENTRANCE */}
       {selectedProduct && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-2 sm:p-6 md:p-10">
-          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col md:flex-row relative shadow-2xl overflow-y-auto md:overflow-hidden">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-2 sm:p-6 md:p-10 transition-opacity duration-300">
+          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col md:flex-row relative shadow-2xl overflow-y-auto md:overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-300">
 
             <button
               onClick={closeProductDetails}
-              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 w-9 h-9 sm:w-10 sm:h-10 bg-white/90 text-[#4a2c2a] rounded-full flex items-center justify-center hover:bg-[#a35d58] hover:text-white transition-colors shadow-md border border-[#f5e1df]"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 w-9 h-9 sm:w-10 sm:h-10 bg-white/90 text-[#4a2c2a] rounded-full flex items-center justify-center hover:bg-[#a35d58] hover:text-white transition-all duration-300 shadow-md border border-[#f5e1df]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
@@ -208,8 +241,9 @@ export default function HomePage() {
                 onTouchEnd={onTouchEnd}
                 className="w-full aspect-square relative rounded-xl overflow-hidden bg-white border border-[#f5e1df] shadow-sm cursor-grab active:cursor-grabbing"
               >
+                {/* Amazon Style Sliding Track */}
                 <div
-                  className="flex h-full transition-transform duration-300 ease-out"
+                  className="flex h-full transition-transform duration-500 ease-out"
                   style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
                 >
                   {imagesList.map((img, idx) => (
@@ -219,13 +253,15 @@ export default function HomePage() {
                   ))}
                 </div>
 
+                {/* Chhota Number Badge */}
                 {imagesList.length > 1 && (
-                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[9px] font-medium px-1.5 py-0.5 rounded-full pointer-events-none md:hidden shadow-sm z-10 tracking-widest">
+                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md text-white text-[9px] font-medium px-2 py-0.5 rounded-full pointer-events-none md:hidden shadow-sm z-10 tracking-widest">
                     {currentImageIndex + 1} / {imagesList.length}
                   </div>
                 )}
               </div>
 
+              {/* Thumbnails Horizontal Scroll */}
               <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
                 {imagesList.map((img, idx) => (
                   <button
@@ -303,7 +339,7 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
             type="checkbox"
             checked={includePrice}
             onChange={(e) => setIncludePrice(e.target.checked)}
-            className="accent-[#a35d58] w-4 h-4"
+            className="accent-[#a35d58] w-4 h-4 rounded"
           />
           Include Price in message
         </label>
@@ -314,28 +350,28 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
         <button
           type="button"
           onClick={() => handleQuickOptionClick("Available colors?")}
-          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
+          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] hover:border-[#a35d58] transition-all"
         >
           🎨 Available Colors?
         </button>
         <button
           type="button"
           onClick={() => handleQuickOptionClick("Custom size needed")}
-          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
+          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] hover:border-[#a35d58] transition-all"
         >
           📏 Custom Size
         </button>
         <button
           type="button"
           onClick={() => handleQuickOptionClick("What is the delivery time?")}
-          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
+          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] hover:border-[#a35d58] transition-all"
         >
           ⏱️ Delivery Time?
         </button>
         <button
           type="button"
           onClick={() => handleQuickOptionClick("What is the Price?")}
-          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
+          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] hover:border-[#a35d58] transition-all"
         >
           ⏱️ Price?
         </button>
@@ -346,12 +382,12 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
         rows={2}
         value={customMsg}
         onChange={(e) => setCustomMsg(e.target.value)}
-        className="p-3 bg-white border border-[#eed6d3] rounded-lg text-sm outline-none focus:border-[#a35d58] text-[#4a2c2a]"
+        className="p-3 bg-white border border-[#eed6d3] rounded-lg text-sm outline-none focus:border-[#a35d58] text-[#4a2c2a] transition-colors"
       ></textarea>
 
       <button
         onClick={handleWhatsAppSend}
-        className="w-full py-3.5 bg-[#4a2c2a] text-white text-sm tracking-widest uppercase font-bold hover:bg-[#a35d58] transition-all duration-300 shadow-md flex items-center justify-center gap-2 rounded-lg"
+        className="w-full py-3.5 bg-[#4a2c2a] text-white text-sm tracking-widest uppercase font-bold hover:bg-[#a35d58] transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 rounded-lg"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
         Send Enquiry via WhatsApp
