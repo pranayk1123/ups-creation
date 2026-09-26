@@ -185,8 +185,8 @@ export default function HomePage() {
                     >
                       <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-700 ease-out group-hover:scale-105" />
 
-                      {/* 🏷️ CHHOTA TRANSPARENT WATERMARK LOGO ON TOP-LEFT */}
-                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 w-7 h-7 sm:w-9 sm:h-9 rounded-full overflow-hidden border border-white/40 shadow-sm opacity-75 backdrop-blur-md pointer-events-none">
+                      {/* 🏷️ WATERMARK LOGO ON PRODUCT CARD (TOP-LEFT) */}
+                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 w-7 h-7 sm:w-9 sm:h-9 rounded-full overflow-hidden border border-white/40 shadow-sm opacity-75 backdrop-blur-md pointer-events-none z-10">
                         <Image src="/logo.jpg.jpeg" alt="UP's Creation Logo" fill className="object-cover" />
                       </div>
 
@@ -228,7 +228,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* POPUP MODAL WITH SMOOTH ENTRANCE */}
+      {/* POPUP MODAL WITH WATERMARK LOGO */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-2 sm:p-6 md:p-10 transition-opacity duration-300">
           <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col md:flex-row relative shadow-2xl overflow-y-auto md:overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-300">
@@ -258,6 +258,11 @@ export default function HomePage() {
                       <Image src={img} alt={`Slide ${idx}`} fill className="object-cover" />
                     </div>
                   ))}
+                </div>
+
+                {/* 🏷️ WATERMARK LOGO ON MODAL MAIN IMAGE (TOP-LEFT) */}
+                <div className="absolute top-3 left-3 w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-white/40 shadow-sm opacity-75 backdrop-blur-md pointer-events-none z-10">
+                  <Image src="/logo.jpg.jpeg" alt="UP's Creation Logo" fill className="object-cover" />
                 </div>
 
                 {/* Chhota Number Badge */}
