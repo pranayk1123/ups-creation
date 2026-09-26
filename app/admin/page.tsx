@@ -133,7 +133,8 @@ export default function AdminPage() {
   // --- LOGIN SCREEN ---
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#fdf7f7] px-4">
+      // ITHI BADAL KELA AHE: pt-28 add kela
+      <div className="min-h-screen flex items-center justify-center bg-[#fdf7f7] px-4 pt-28">
         <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm flex flex-col gap-5 border border-[#f5e1df]">
           <h2 className="text-3xl font-serif text-[#4a2c2a] text-center mb-2">Admin Login</h2>
           <input 
@@ -162,7 +163,8 @@ export default function AdminPage() {
 
   // --- ADMIN DASHBOARD ---
   return (
-    <div className="min-h-screen bg-[#fdf7f7] py-10 px-6">
+    // ITHI BADAL KELA AHE: pt-32 add kela
+    <div className="min-h-screen bg-[#fdf7f7] pb-10 pt-32 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm border border-[#f5e1df]">
           <h1 className="text-3xl font-serif text-[#4a2c2a]">Admin Dashboard</h1>
@@ -178,7 +180,7 @@ export default function AdminPage() {
 
         {isFormOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-            <div className="bg-[#fdf7f7] p-8 rounded-2xl shadow-2xl max-w-md w-full border border-[#f5e1df] max-h-[90vh] overflow-y-auto">
+            <div className="bg-[#fdf7f7] p-8 rounded-2xl shadow-2xl max-w-md w-full border border-[#f5e1df] max-h-[90vh] overflow-y-auto mt-20">
               <h3 className="text-2xl font-serif text-[#4a2c2a] mb-6 text-center">Add New Creation</h3>
               <form onSubmit={handleAddProduct} className="flex flex-col gap-4">
                 <input type="text" placeholder="Product Name" required value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]" />

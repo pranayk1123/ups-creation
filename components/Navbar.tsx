@@ -29,6 +29,10 @@ export default function Navbar() {
         <Link href="#contact" className="text-[#4a2c2a] hover:text-[#a35d58] text-xs tracking-widest uppercase font-bold transition-colors">
           Contact
         </Link>
+        {/* ADDED ADMIN LINK HERE */}
+        <Link href="/admin" className="text-[#4a2c2a] hover:text-[#a35d58] text-xs tracking-widest uppercase font-bold transition-colors">
+          Admin
+        </Link>
       </div>
 
       {/* 3. Right Side: Menu Capsule */}
