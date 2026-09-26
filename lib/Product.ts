@@ -5,7 +5,13 @@ const productSchema = new mongoose.Schema(
     name: { type: String, required: true },
     price: { type: String, required: true },
     desc: { type: String, required: true },
-    image: { type: String, default: "/logo.jpg.jpeg" },
+    
+    // Juna single photo (Main Thumbnail sathi)
+    image: { type: String, default: "/logo.jpg.jpeg" }, 
+    
+    // 📸 NAVIN: Multiple photos kiva colors sathi List (Array)
+    images: { type: [String], default: [] }, 
+    
     imgPosition: { type: String, default: "center" },
   },
   { timestamps: true }
