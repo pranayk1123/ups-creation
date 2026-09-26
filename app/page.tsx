@@ -10,7 +10,7 @@ interface ProductType {
   price: string;
   desc: string;
   image: string;
-  images?: string[]; // Multiple photos
+  images?: string[]; 
   imgPosition: string;
 }
 
@@ -19,7 +19,6 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(6);
   
-  // Popup sathi state
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
   const [currentImage, setCurrentImage] = useState<string>('');
 
@@ -122,12 +121,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 🚀 AMAZON STYLE POPUP (MODAL) WITH WHATSAPP ENQUIRY 🚀 */}
+      {/* POPUP MODAL */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4 md:p-10">
           <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row relative shadow-2xl animate-fade-in-up">
             
-            {/* Close Button */}
             <button 
               onClick={() => setSelectedProduct(null)} 
               className="absolute top-4 right-4 z-50 w-10 h-10 bg-white/80 text-[#4a2c2a] rounded-full flex items-center justify-center hover:bg-[#a35d58] hover:text-white transition-colors shadow-md border border-[#f5e1df]"
@@ -135,7 +133,7 @@ export default function HomePage() {
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
             
-            {/* Left Side: Images Gallery */}
+            {/* Left Gallery */}
             <div className="w-full md:w-1/2 bg-[#fdf7f7] p-6 md:p-10 flex flex-col gap-6">
               <div className="w-full aspect-square relative rounded-xl overflow-hidden bg-white border border-[#f5e1df] shadow-sm">
                 <Image src={currentImage} alt={selectedProduct.name} fill className="object-cover" />
@@ -157,7 +155,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Side: Product Details & WhatsApp Enquiry Options */}
+            {/* Right Details */}
             <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-between bg-white overflow-y-auto max-h-[90vh]">
               <div>
                 <p className="text-xs font-bold tracking-[0.2em] uppercase text-[#a35d58] mb-3">UP's Creation</p>
@@ -170,7 +168,6 @@ export default function HomePage() {
                 <p className="text-[#6b4441] leading-relaxed mb-6 whitespace-pre-wrap font-light text-sm">{selectedProduct.desc}</p>
               </div>
 
-              {/* WhatsApp Custom Enquiry Box */}
               <WhatsAppEnquirySection product={selectedProduct} currentImage={currentImage} />
             </div>
 
@@ -182,17 +179,22 @@ export default function HomePage() {
   );
 }
 
-// 💬 WhatsApp Enquiry Section Component with Custom Message & Options
+// 💬 WhatsApp Enquiry Section with Quick Pills & Conditional Price
 function WhatsAppEnquirySection({ product, currentImage }: { product: ProductType, currentImage: string }) {
   const [customMsg, setCustomMsg] = useState("");
-  const [includePrice, setIncludePrice] = useState(true);
+  const hasValidPrice = product.price && product.price.trim() !== "" && product.price.trim() !== " ";
+  const [includePrice, setIncludePrice] = useState(hasValidPrice);
+
+  const handleQuickOptionClick = (optionText: string) => {
+    setCustomMsg(prev => (prev ? `${prev}, ${optionText}` : optionText));
+  };
 
   const handleWhatsAppSend = () => {
-    const phoneNumber = "919594790996"; // 👈 CHANGE THIS TO YOUR WHATSAPP NUMBER
+    const phoneNumber = "919594790996"; 
 
     let message = `Hello UP's Creation, I want to enquire about this product:\n\n`;
     message += `*Product:* ${product.name}\n`;
-    if (includePrice && product.price) {
+    if (hasValidPrice && includePrice) {
       message += `*Price:* ${product.price}\n`;
     }
     message += `*Photo Link:* ${currentImage}\n`;
@@ -211,15 +213,44 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
     <div className="bg-[#fdf7f7] p-4 rounded-xl border border-[#f5e1df] flex flex-col gap-3 mt-4">
       <h4 className="text-xs font-bold text-[#4a2c2a] uppercase tracking-wider">Enquire via WhatsApp</h4>
       
-      <label className="flex items-center gap-2 text-sm text-[#6b4441] cursor-pointer select-none">
-        <input 
-          type="checkbox" 
-          checked={includePrice} 
-          onChange={(e) => setIncludePrice(e.target.checked)}
-          className="accent-[#a35d58] w-4 h-4"
-        />
-        Include Price in message
-      </label>
+      {/* 🔻 FAKT PRICE ASEL TARACH PRICE CHECKBOX DISEL 🔻 */}
+      {hasValidPrice && (
+        <label className="flex items-center gap-2 text-sm text-[#6b4441] cursor-pointer select-none">
+          <input 
+            type="checkbox" 
+            checked={includePrice} 
+            onChange={(e) => setIncludePrice(e.target.checked)}
+            className="accent-[#a35d58] w-4 h-4"
+          />
+          Include Price in message
+        </label>
+      )}
+
+      {/* 🚀 QUICK ENQUIRY PILLS (Click kelyavar direct text add hoil) */}
+      <div className="flex flex-wrap gap-1.5">
+        <span className="text-[11px] text-[#a35d58] font-bold w-full mb-1">Quick Options (Click to add):</span>
+        <button 
+          type="button" 
+          onClick={() => handleQuickOptionClick("Available colors?")}
+          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
+        >
+          🎨 Available Colors?
+        </button>
+        <button 
+          type="button" 
+          onClick={() => handleQuickOptionClick("Custom size needed")}
+          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
+        >
+          📏 Custom Size
+        </button>
+        <button 
+          type="button" 
+          onClick={() => handleQuickOptionClick("What is the delivery time?")}
+          className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
+        >
+          ⏱️ Delivery Time?
+        </button>
+      </div>
 
       <textarea 
         placeholder="Type custom color, size or message here (Optional)..." 
