@@ -75,34 +75,35 @@ export default function HomePage() {
             <div className="text-center text-[#6b4441] my-20 italic">Products coming soon...</div>
           ) : (
             <div className="flex flex-col items-center w-full mt-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 w-full">
+              {/* 📱 MOBILE: grid-cols-2 (Eka row madhe 2 products) */}
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
                 {products.slice(0, visibleCount).map((product) => (
-                  <div key={product._id} className="group bg-white rounded-none p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col">
+                  <div key={product._id} className="group bg-white rounded-none p-3 sm:p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col">
                     
                     <div 
                       onClick={() => openProductDetails(product)}
-                      className="w-full h-80 bg-[#fdf7f7] mb-8 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500 cursor-pointer"
+                      className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-4 sm:mb-8 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500 cursor-pointer"
                     >
-                      <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
+                      <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
                       {product.images && product.images.length > 1 && (
-                        <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm text-xs font-bold text-[#4a2c2a] px-2 py-1 rounded-full flex gap-1 items-center shadow-sm">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/80 backdrop-blur-sm text-[10px] sm:text-xs font-bold text-[#4a2c2a] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full flex gap-1 items-center shadow-sm">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                            {product.images.length}
                         </div>
                       )}
                     </div>
                     
                     <div className="text-center flex-grow">
-                      <h3 className="text-2xl font-serif text-[#4a2c2a] mb-3">{product.name}</h3>
-                      <p className="text-[#6b4441] text-sm font-light leading-relaxed mb-6 px-4 mx-auto line-clamp-2">{product.desc}</p>
+                      <h3 className="text-lg sm:text-2xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 line-clamp-1">{product.name}</h3>
+                      <p className="text-[#6b4441] text-xs sm:text-sm font-light leading-relaxed mb-4 sm:mb-6 px-1 sm:px-4 mx-auto line-clamp-2">{product.desc}</p>
                     </div>
-                    <div className="flex flex-col items-center pt-4 border-t border-[#f5e1df]">
+                    <div className="flex flex-col items-center pt-3 sm:pt-4 border-t border-[#f5e1df]">
                       {product.price && product.price.trim() !== '' && (
-                        <span className="text-xl font-serif text-[#a35d58] mb-4">{product.price}</span>
+                        <span className="text-base sm:text-xl font-serif text-[#a35d58] mb-2 sm:mb-4">{product.price}</span>
                       )}
                       <button 
                         onClick={() => openProductDetails(product)}
-                        className="w-full py-3 bg-transparent text-[#4a2c2a] text-sm tracking-widest uppercase border border-[#4a2c2a] hover:bg-[#4a2c2a] hover:text-white transition-all duration-300"
+                        className="w-full py-2 sm:py-3 bg-transparent text-[#4a2c2a] text-[11px] sm:text-sm tracking-widest uppercase border border-[#4a2c2a] hover:bg-[#4a2c2a] hover:text-white transition-all duration-300"
                       >
                         View Details
                       </button>
@@ -182,7 +183,6 @@ export default function HomePage() {
 // 💬 WhatsApp Enquiry Section with Quick Pills & Conditional Price
 function WhatsAppEnquirySection({ product, currentImage }: { product: ProductType, currentImage: string }) {
   const [customMsg, setCustomMsg] = useState("");
-  // Boolean() lavlyamule typescript la exact true/false bhetel
   const hasValidPrice = Boolean(product.price && product.price.trim() !== "" && product.price.trim() !== " ");
   const [includePrice, setIncludePrice] = useState(hasValidPrice);
   
@@ -214,7 +214,6 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
     <div className="bg-[#fdf7f7] p-4 rounded-xl border border-[#f5e1df] flex flex-col gap-3 mt-4">
       <h4 className="text-xs font-bold text-[#4a2c2a] uppercase tracking-wider">Enquire via WhatsApp</h4>
       
-      {/* 🔻 FAKT PRICE ASEL TARACH PRICE CHECKBOX DISEL 🔻 */}
       {hasValidPrice && (
         <label className="flex items-center gap-2 text-sm text-[#6b4441] cursor-pointer select-none">
           <input 
@@ -227,7 +226,6 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
         </label>
       )}
 
-      {/* 🚀 QUICK ENQUIRY PILLS (Click kelyavar direct text add hoil) */}
       <div className="flex flex-wrap gap-1.5">
         <span className="text-[11px] text-[#a35d58] font-bold w-full mb-1">Quick Options (Click to add):</span>
         <button 
