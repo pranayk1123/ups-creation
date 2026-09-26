@@ -31,7 +31,7 @@ export default function Navbar() {
           <Image src="/logo.jpg.jpeg" alt="UP's Creation Logo" fill className="object-cover" />
         </div>
         
-        <h2 className="hidden sm:flex items-baseline gap-1.5 drop-shadow-md">
+        <h2 className="flex items-baseline gap-1.5 drop-shadow-md">
           <span className="text-2xl font-serif font-extrabold text-[#4a2c2a] tracking-wider">UP's</span>
           <span className="text-3xl font-serif italic text-[#a35d58] tracking-wide">Creation</span>
         </h2>
