@@ -35,19 +35,26 @@ export default function AdminPage() {
     }
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // .env file madhun Username ani Password check kartoy
-    const envUsername = process.env.ADMIN_USERNAME;
-    const envPassword = process.env.ADMIN_PASSWORD;
+    try {
+      // API la username ani password pathvun check kar
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
 
-    if (username === envUsername && password === envPassword) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem("isAdmin", "true");
-      fetchProducts();
-    } else {
-      alert("Wrong Username or Password! Please try again.");
+      if (res.ok) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem("isAdmin", "true");
+        fetchProducts();
+      } else {
+        alert("Wrong Username or Password! Please try again.");
+      }
+    } catch (error) {
+      console.error("Login madhe problem aala:", error);
     }
   };
 
