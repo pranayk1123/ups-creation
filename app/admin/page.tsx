@@ -21,10 +21,13 @@ export default function AdminPage() {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // 📝 EDIT STATE: Jar product edit karaycha asel tar ithe data store hoil
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState({
     name: '', price: '', desc: '', image: '', imgPosition: 'center',
   });
-  
+  const [currentImages, setCurrentImages] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   useEffect(() => {
@@ -78,11 +81,32 @@ export default function AdminPage() {
     }
   };
 
-  const handleAddProduct = async (e: React.FormEvent) => {
+  // ✏️ Open form for Editing
+  const handleOpenEdit = (product: ProductType) => {
+    setEditingProductId(product._id);
+    setNewProduct({
+      name: product.name,
+      price: product.price === ' ' ? '' : product.price,
+      desc: product.desc,
+      image: '',
+      imgPosition: product.imgPosition || 'center',
+    });
+    setCurrentImages(product.images && product.images.length > 0 ? product.images : [product.image]);
+    setSelectedFiles([]);
+    setIsFormOpen(true);
+  };
+
+  // 🗑️ Delete specific image from current list while editing/adding
+  const handleRemoveExistingImage = (indexToRemove: number) => {
+    setCurrentImages(currentImages.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    let uploadedUrls: string[] = [];
+    let uploadedUrls = [...currentImages];
 
+    // Upload newly selected files
     if (selectedFiles.length > 0) {
       for (const file of selectedFiles) {
         const formData = new FormData();
@@ -107,8 +131,11 @@ export default function AdminPage() {
     const finalPrice = newProduct.price.trim() === '' ? ' ' : newProduct.price;
 
     try {
-      const res = await fetch('/api/products', {
-        method: 'POST',
+      const url = editingProductId ? `/api/products?id=${editingProductId}` : '/api/products';
+      const method = editingProductId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           ...newProduct, 
@@ -117,10 +144,13 @@ export default function AdminPage() {
           images: uploadedUrls 
         }),
       });
+
       if (res.ok) {
         fetchProducts();
         setIsFormOpen(false);
+        setEditingProductId(null);
         setNewProduct({ name: '', price: '', desc: '', image: '', imgPosition: 'center' });
+        setCurrentImages([]);
         setSelectedFiles([]);
       }
     } catch (error) {
@@ -158,21 +188,49 @@ export default function AdminPage() {
         <div className="flex justify-between items-center mb-10 bg-white p-6 rounded-2xl shadow-sm border border-[#f5e1df]">
           <h1 className="text-3xl font-serif text-[#4a2c2a]">Admin Dashboard</h1>
           <div className="flex gap-4">
-            <button onClick={() => setIsFormOpen(true)} className="px-6 py-2 bg-[#a35d58] text-white rounded-full font-bold uppercase tracking-widest text-sm shadow-md hover:bg-[#4a2c2a] transition-all">+ Add Product</button>
+            <button onClick={() => { 
+              setEditingProductId(null);
+              setNewProduct({ name: '', price: '', desc: '', image: '', imgPosition: 'center' });
+              setCurrentImages([]);
+              setSelectedFiles([]);
+              setIsFormOpen(true); 
+            }} className="px-6 py-2 bg-[#a35d58] text-white rounded-full font-bold uppercase tracking-widest text-sm shadow-md hover:bg-[#4a2c2a] transition-all">+ Add Product</button>
             <button onClick={handleLogout} className="px-6 py-2 bg-transparent text-[#4a2c2a] border border-[#4a2c2a] rounded-full font-bold uppercase tracking-widest text-sm hover:bg-[#fceceb] transition-all">Logout</button>
           </div>
         </div>
 
+        {/* ADD / EDIT MODAL FORM */}
         {isFormOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
             <div className="bg-[#fdf7f7] p-8 rounded-2xl shadow-2xl max-w-md w-full border border-[#f5e1df] max-h-[90vh] overflow-y-auto mt-20">
-              <h3 className="text-2xl font-serif text-[#4a2c2a] mb-6 text-center">Add New Creation</h3>
-              <form onSubmit={handleAddProduct} className="flex flex-col gap-4">
+              <h3 className="text-2xl font-serif text-[#4a2c2a] mb-6 text-center">{editingProductId ? 'Edit Creation' : 'Add New Creation'}</h3>
+              <form onSubmit={handleSaveProduct} className="flex flex-col gap-4">
                 <input type="text" placeholder="Product Name" required value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]" />
                 <input type="text" placeholder="Price (Optional)" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]" />
                 
+                {/* Existing Images preview with Delete option */}
+                {currentImages.length > 0 && (
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-[#6b4441] font-bold">Current Photos (Click ✕ to remove)</label>
+                    <div className="flex gap-2 flex-wrap bg-white p-2 border border-[#eed6d3] rounded-lg">
+                      {currentImages.map((imgUrl, idx) => (
+                        <div key={idx} className="relative w-14 h-14 rounded overflow-hidden border border-[#eed6d3]">
+                          <Image src={imgUrl} alt={`Current ${idx}`} fill className="object-cover" />
+                          <button 
+                            type="button" 
+                            onClick={() => handleRemoveExistingImage(idx)}
+                            className="absolute top-0 right-0 bg-red-600 text-white w-5 h-5 flex items-center justify-center text-[10px] font-bold rounded-bl"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-col gap-2 p-3 bg-white border border-[#eed6d3] rounded-lg">
-                  <label className="text-sm text-[#6b4441] font-bold">Images (Select Multiple by pressing Ctrl)</label>
+                  <label className="text-sm text-[#6b4441] font-bold">Add More Images</label>
                   <input type="file" multiple accept="image/*" onChange={handleFileUpload} className="text-sm text-[#4a2c2a] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#fceceb] file:text-[#a35d58] hover:file:bg-[#eed6d3]" />
                   <div className="text-center text-xs text-[#a35d58] my-1">OR</div>
                   <input type="text" placeholder="Paste single Image URL here..." value={newProduct.image} onChange={(e) => { setNewProduct({...newProduct, image: e.target.value}); setSelectedFiles([]); }} className="p-2 border border-[#eed6d3] rounded text-sm outline-none focus:border-[#a35d58]" />
@@ -203,7 +261,7 @@ export default function AdminPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 w-full">
             {products.map((product) => (
-              <AdminProductCard key={product._id} product={product} handleDeleteProduct={handleDeleteProduct} />
+              <AdminProductCard key={product._id} product={product} handleDeleteProduct={handleDeleteProduct} handleOpenEdit={handleOpenEdit} />
             ))}
           </div>
         )}
@@ -212,20 +270,29 @@ export default function AdminPage() {
   );
 }
 
-// Separate component to handle independent active image state for each product card
-function AdminProductCard({ product, handleDeleteProduct }: { product: ProductType, handleDeleteProduct: (id: string) => void }) {
+// Separate component for product card with Edit & Delete actions
+function AdminProductCard({ product, handleDeleteProduct, handleOpenEdit }: { product: ProductType, handleDeleteProduct: (id: string) => void, handleOpenEdit: (p: ProductType) => void }) {
   const [activeImage, setActiveImage] = useState(product.image || "/logo.jpg.jpeg");
 
   return (
     <div className="group bg-white rounded-none p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col relative">
-      <button onClick={() => handleDeleteProduct(product._id)} className="absolute top-2 right-2 w-8 h-8 bg-red-500/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 hover:bg-red-600 shadow-md">✕</button>
+      <div className="absolute top-2 right-2 flex gap-2 z-20">
+        {/* ✏️ Edit Button */}
+        <button onClick={() => handleOpenEdit(product)} className="w-8 h-8 bg-[#4a2c2a] text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#a35d58] shadow-md" title="Edit Product">
+          ✎
+        </button>
+        {/* ✕ Delete Button */}
+        <button onClick={() => handleDeleteProduct(product._id)} className="w-8 h-8 bg-red-500/90 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-600 shadow-md" title="Delete Product">
+          ✕
+        </button>
+      </div>
       
       {/* Main Image */}
       <div className="w-full h-80 bg-[#fdf7f7] mb-4 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500">
         <Image src={activeImage} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
       </div>
 
-      {/* Thumbnails - Clicking changes the activeImage */}
+      {/* Thumbnails */}
       {product.images && product.images.length > 1 && (
         <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
           {product.images.map((imgUrl, i) => (
