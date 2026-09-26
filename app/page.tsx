@@ -168,7 +168,7 @@ export default function HomePage() {
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
 
-            {/* Left Gallery */}
+            {/* Left Gallery with Amazon-style Smooth Horizontal Slide */}
             <div className="w-full md:w-1/2 bg-[#fdf7f7] p-4 sm:p-8 flex flex-col gap-4 flex-shrink-0">
               <div
                 onTouchStart={onTouchStart}
@@ -176,25 +176,27 @@ export default function HomePage() {
                 onTouchEnd={onTouchEnd}
                 className="w-full aspect-square relative rounded-xl overflow-hidden bg-white border border-[#f5e1df] shadow-sm cursor-grab active:cursor-grabbing"
               >
-                {/* ⚡ Transition animation added here for smooth sliding feel */}
-                <div className="relative w-full h-full transition-all duration-300 ease-in-out">
-                  <Image
-                    key={currentImageIndex} // Key change zalyavar React smooth fade/slide render karel
-                    src={currentImage}
-                    alt={selectedProduct.name}
-                    fill
-                    className="object-cover animate-fade-in"
-                  />
+                {/* 🛒 Amazon Style Sliding Track */}
+                <div
+                  className="flex h-full transition-transform duration-300 ease-out"
+                  style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
+                >
+                  {imagesList.map((img, idx) => (
+                    <div key={idx} className="w-full h-full flex-shrink-0 relative">
+                      <Image src={img} alt={`Slide ${idx}`} fill className="object-cover" />
+                    </div>
+                  ))}
                 </div>
 
                 {/* Chhota Number Badge (1/3) */}
                 {imagesList.length > 1 && (
-                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-0.5 rounded-full pointer-events-none md:hidden shadow-sm z-10">
+                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium px-2.5 py-0.5 rounded-full pointer-events-none md:hidden shadow-sm z-10 tracking-widest">
                     {currentImageIndex + 1} / {imagesList.length}
                   </div>
                 )}
               </div>
 
+              {/* Thumbnails Horizontal Scroll */}
               <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
                 {imagesList.map((img, idx) => (
                   <button
