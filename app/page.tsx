@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import Link from 'next/link';
 import Image from 'next/image';
@@ -10,7 +10,7 @@ interface ProductType {
   price: string;
   desc: string;
   image: string;
-  images?: string[]; 
+  images?: string[];
   imgPosition: string;
 }
 
@@ -18,9 +18,9 @@ export default function HomePage() {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(6);
-  
+
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
-  const [currentImage, setCurrentImage] = useState<string>('');
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -43,7 +43,42 @@ export default function HomePage() {
 
   const openProductDetails = (product: ProductType) => {
     setSelectedProduct(product);
-    setCurrentImage(product.images && product.images.length > 0 ? product.images[0] : (product.image || "/logo.jpg.jpeg"));
+    setCurrentImageIndex(0);
+  };
+
+  const imagesList = selectedProduct
+    ? (selectedProduct.images && selectedProduct.images.length > 0 ? selectedProduct.images : [selectedProduct.image || "/logo.jpg.jpeg"])
+    : [];
+
+  const currentImage = imagesList[currentImageIndex] || "/logo.jpg.jpeg";
+
+  // TOUCH SWIPE LOGIC FOR MOBILE
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      setCurrentImageIndex((prev) => (prev < imagesList.length - 1 ? prev + 1 : prev));
+    }
+    if (isRightSwipe) {
+      setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    }
   };
 
   return (
@@ -52,7 +87,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#fceceb]/50 to-transparent pointer-events-none"></div>
         <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center">
           <p className="text-sm md:text-base text-[#a35d58] mb-6 tracking-[0.3em] uppercase font-medium">Handcrafted in Mumbai</p>
-          <h1 className="text-6xl md:text-8xl font-serif text-[#4a2c2a] mb-8 leading-tight">Handmade <br/> <span className="italic text-[#a35d58]">with Love</span></h1>
+          <h1 className="text-6xl md:text-8xl font-serif text-[#4a2c2a] mb-8 leading-tight">Handmade <br /> <span className="italic text-[#a35d58]">with Love</span></h1>
           <p className="text-lg text-[#6b4441] mb-12 max-w-xl mx-auto leading-relaxed font-light">
             Discover our premium collection of crochet artistry, bespoke gifts, and elegant home decor. Stitched meticulously for your special moments.
           </p>
@@ -75,24 +110,23 @@ export default function HomePage() {
             <div className="text-center text-[#6b4441] my-20 italic">Products coming soon...</div>
           ) : (
             <div className="flex flex-col items-center w-full mt-10">
-              {/* 📱 MOBILE: grid-cols-2 (Eka row madhe 2 products) */}
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
                 {products.slice(0, visibleCount).map((product) => (
                   <div key={product._id} className="group bg-white rounded-none p-3 sm:p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col">
-                    
-                    <div 
+
+                    <div
                       onClick={() => openProductDetails(product)}
                       className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-4 sm:mb-8 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500 cursor-pointer"
                     >
-                      <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
+                      <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />
                       {product.images && product.images.length > 1 && (
                         <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/80 backdrop-blur-sm text-[10px] sm:text-xs font-bold text-[#4a2c2a] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full flex gap-1 items-center shadow-sm">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                           {product.images.length}
+                          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                          {product.images.length}
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="text-center flex-grow">
                       <h3 className="text-lg sm:text-2xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 line-clamp-1">{product.name}</h3>
                       <p className="text-[#6b4441] text-xs sm:text-sm font-light leading-relaxed mb-4 sm:mb-6 px-1 sm:px-4 mx-auto line-clamp-2">{product.desc}</p>
@@ -101,7 +135,7 @@ export default function HomePage() {
                       {product.price && product.price.trim() !== '' && (
                         <span className="text-base sm:text-xl font-serif text-[#a35d58] mb-2 sm:mb-4">{product.price}</span>
                       )}
-                      <button 
+                      <button
                         onClick={() => openProductDetails(product)}
                         className="w-full py-2 sm:py-3 bg-transparent text-[#4a2c2a] text-[11px] sm:text-sm tracking-widest uppercase border border-[#4a2c2a] hover:bg-[#4a2c2a] hover:text-white transition-all duration-300"
                       >
@@ -125,30 +159,48 @@ export default function HomePage() {
       {/* POPUP MODAL */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-2 sm:p-6 md:p-10">
-          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] overflow-y-auto flex flex-col md:flex-row relative shadow-2xl">
-            
-            <button 
-              onClick={() => setSelectedProduct(null)} 
+          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col md:flex-row relative shadow-2xl overflow-hidden">
+
+            <button
+              onClick={() => setSelectedProduct(null)}
               className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 w-9 h-9 sm:w-10 sm:h-10 bg-white/90 text-[#4a2c2a] rounded-full flex items-center justify-center hover:bg-[#a35d58] hover:text-white transition-colors shadow-md border border-[#f5e1df]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
-            
+
             {/* Left Gallery */}
-            <div className="w-full md:w-1/2 bg-[#fdf7f7] p-4 sm:p-8 flex flex-col gap-4">
-              <div className="w-full aspect-square relative rounded-xl overflow-hidden bg-white border border-[#f5e1df] shadow-sm">
-                <Image src={currentImage} alt={selectedProduct.name} fill className="object-cover" />
+            <div className="w-full md:w-1/2 bg-[#fdf7f7] p-4 sm:p-8 flex flex-col gap-4 flex-shrink-0">
+              <div
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                className="w-full aspect-square relative rounded-xl overflow-hidden bg-white border border-[#f5e1df] shadow-sm cursor-grab active:cursor-grabbing"
+              >
+                {/* ⚡ Transition animation added here for smooth sliding feel */}
+                <div className="relative w-full h-full transition-all duration-300 ease-in-out">
+                  <Image
+                    key={currentImageIndex} // Key change zalyavar React smooth fade/slide render karel
+                    src={currentImage}
+                    alt={selectedProduct.name}
+                    fill
+                    className="object-cover animate-fade-in"
+                  />
+                </div>
+
+                {/* Chhota Number Badge (1/3) */}
+                {imagesList.length > 1 && (
+                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium px-2 py-0.5 rounded-full pointer-events-none md:hidden shadow-sm z-10">
+                    {currentImageIndex + 1} / {imagesList.length}
+                  </div>
+                )}
               </div>
-              
+
               <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
-                {(selectedProduct.images && selectedProduct.images.length > 0 
-                  ? selectedProduct.images 
-                  : [selectedProduct.image || "/logo.jpg.jpeg"]
-                ).map((img, idx) => (
-                  <button 
-                    key={idx} 
-                    onClick={() => setCurrentImage(img)} 
-                    className={`relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden transition-all duration-300 border-2 ${currentImage === img ? 'border-[#a35d58] shadow-md scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                {imagesList.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden transition-all duration-300 border-2 ${currentImageIndex === idx ? 'border-[#a35d58] shadow-md scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}
                   >
                     <Image src={img} alt={`Variant ${idx}`} fill className="object-cover" />
                   </button>
@@ -157,16 +209,16 @@ export default function HomePage() {
             </div>
 
             {/* Right Details */}
-            <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col justify-between bg-white">
-              <div>
+            <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col bg-white overflow-y-auto max-h-[92vh]">
+              <div className="mb-4">
                 <p className="text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase text-[#a35d58] mb-1 sm:mb-2">UP's Creation</p>
                 <h2 className="text-2xl sm:text-4xl md:text-5xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 leading-tight">{selectedProduct.name}</h2>
                 <p className="text-xl sm:text-3xl font-serif text-[#a35d58] mb-4">{selectedProduct.price}</p>
-                
+
                 <div className="w-full h-[1px] bg-[#f5e1df] mb-4"></div>
-                
+
                 <h4 className="text-xs sm:text-sm font-bold text-[#4a2c2a] uppercase tracking-wider mb-1">Product Description</h4>
-                <p className="text-[#6b4441] leading-relaxed mb-4 whitespace-pre-wrap font-light text-xs sm:text-sm line-clamp-4">{selectedProduct.desc}</p>
+                <p className="text-[#6b4441] leading-relaxed mb-4 whitespace-pre-wrap font-light text-xs sm:text-sm">{selectedProduct.desc}</p>
               </div>
 
               <WhatsAppEnquirySection product={selectedProduct} currentImage={currentImage} />
@@ -185,13 +237,13 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
   const [customMsg, setCustomMsg] = useState("");
   const hasValidPrice = Boolean(product.price && product.price.trim() !== "" && product.price.trim() !== " ");
   const [includePrice, setIncludePrice] = useState(hasValidPrice);
-  
+
   const handleQuickOptionClick = (optionText: string) => {
     setCustomMsg(prev => (prev ? `${prev}, ${optionText}` : optionText));
   };
 
   const handleWhatsAppSend = () => {
-    const phoneNumber = "919594790996"; 
+    const phoneNumber = "919594790996";
 
     let message = `Hello UP's Creation, I want to enquire about this product:\n\n`;
     message += `*Product:* ${product.name}\n`;
@@ -206,19 +258,19 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-    
+
     window.open(whatsappUrl, '_blank');
   };
 
   return (
-    <div className="bg-[#fdf7f7] p-4 rounded-xl border border-[#f5e1df] flex flex-col gap-3 mt-4">
+    <div className="bg-[#fdf7f7] p-4 rounded-xl border border-[#f5e1df] flex flex-col gap-3 mt-auto">
       <h4 className="text-xs font-bold text-[#4a2c2a] uppercase tracking-wider">Enquire via WhatsApp</h4>
-      
+
       {hasValidPrice && (
         <label className="flex items-center gap-2 text-sm text-[#6b4441] cursor-pointer select-none">
-          <input 
-            type="checkbox" 
-            checked={includePrice} 
+          <input
+            type="checkbox"
+            checked={includePrice}
             onChange={(e) => setIncludePrice(e.target.checked)}
             className="accent-[#a35d58] w-4 h-4"
           />
@@ -228,29 +280,29 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
 
       <div className="flex flex-wrap gap-1.5">
         <span className="text-[11px] text-[#a35d58] font-bold w-full mb-1">Quick Options (Click to add):</span>
-        <button 
-          type="button" 
+        <button
+          type="button"
           onClick={() => handleQuickOptionClick("Available colors?")}
           className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
         >
           🎨 Available Colors?
         </button>
-        <button 
-          type="button" 
+        <button
+          type="button"
           onClick={() => handleQuickOptionClick("Custom size needed")}
           className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
         >
           📏 Custom Size
         </button>
-        <button 
-          type="button" 
+        <button
+          type="button"
           onClick={() => handleQuickOptionClick("What is the delivery time?")}
           className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
         >
           ⏱️ Delivery Time?
         </button>
-        <button 
-          type="button" 
+        <button
+          type="button"
           onClick={() => handleQuickOptionClick("What is the Price?")}
           className="text-xs bg-white border border-[#eed6d3] text-[#4a2c2a] px-3 py-1 rounded-full hover:bg-[#fceceb] transition-colors"
         >
@@ -258,15 +310,15 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
         </button>
       </div>
 
-      <textarea 
-        placeholder="Type custom color, size or message here (Optional)..." 
+      <textarea
+        placeholder="Type custom color, size or message here (Optional)..."
         rows={2}
         value={customMsg}
         onChange={(e) => setCustomMsg(e.target.value)}
         className="p-3 bg-white border border-[#eed6d3] rounded-lg text-sm outline-none focus:border-[#a35d58] text-[#4a2c2a]"
       ></textarea>
 
-      <button 
+      <button
         onClick={handleWhatsAppSend}
         className="w-full py-3.5 bg-[#4a2c2a] text-white text-sm tracking-widest uppercase font-bold hover:bg-[#a35d58] transition-all duration-300 shadow-md flex items-center justify-center gap-2 rounded-lg"
       >
