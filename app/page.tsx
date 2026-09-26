@@ -37,6 +37,24 @@ export default function HomePage() {
     fetchProducts();
   }, []);
 
+  // 🔙 MOBILE BACK BUTTON FIX: Back button dablyavar purna page refresh honya aivaji fakt popup band hoil
+  useEffect(() => {
+    const handlePopState = () => {
+      if (selectedProduct) {
+        setSelectedProduct(null);
+      }
+    };
+
+    if (selectedProduct) {
+      window.history.pushState({ modalOpen: true }, '');
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [selectedProduct]);
+
   const handleShowMore = () => {
     setVisibleCount(prevCount => prevCount + 6);
   };
@@ -44,6 +62,10 @@ export default function HomePage() {
   const openProductDetails = (product: ProductType) => {
     setSelectedProduct(product);
     setCurrentImageIndex(0);
+  };
+
+  const closeProductDetails = () => {
+    setSelectedProduct(null);
   };
 
   const imagesList = selectedProduct
@@ -156,19 +178,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* POPUP MODAL */}
+      {/* POPUP MODAL (FIXED SCROLL & HEIGHT FOR MOBILE) */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-2 sm:p-6 md:p-10">
-          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col md:flex-row relative shadow-2xl overflow-hidden">
+          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col md:flex-row relative shadow-2xl overflow-y-auto md:overflow-hidden">
 
             <button
-              onClick={() => setSelectedProduct(null)}
+              onClick={closeProductDetails}
               className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 w-9 h-9 sm:w-10 sm:h-10 bg-white/90 text-[#4a2c2a] rounded-full flex items-center justify-center hover:bg-[#a35d58] hover:text-white transition-colors shadow-md border border-[#f5e1df]"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
 
-            {/* Left Gallery with Amazon-style Smooth Horizontal Slide */}
+            {/* Left Gallery */}
             <div className="w-full md:w-1/2 bg-[#fdf7f7] p-4 sm:p-8 flex flex-col gap-4 flex-shrink-0">
               <div
                 onTouchStart={onTouchStart}
@@ -190,7 +212,7 @@ export default function HomePage() {
 
                 {/* Chhota Number Badge (1/3) */}
                 {imagesList.length > 1 && (
-                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium px-2.5 py-0.5 rounded-full pointer-events-none md:hidden shadow-sm z-10 tracking-widest">
+                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[9px] font-medium px-1.5 py-0.5 rounded-full pointer-events-none md:hidden shadow-sm z-10 tracking-widest">
                     {currentImageIndex + 1} / {imagesList.length}
                   </div>
                 )}
@@ -210,8 +232,8 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Details */}
-            <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col bg-white overflow-y-auto max-h-[92vh]">
+            {/* Right Details with smooth vertical scroll */}
+            <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col bg-white md:overflow-y-auto md:max-h-[92vh]">
               <div className="mb-4">
                 <p className="text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase text-[#a35d58] mb-1 sm:mb-2">UP's Creation</p>
                 <h2 className="text-2xl sm:text-4xl md:text-5xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 leading-tight">{selectedProduct.name}</h2>
