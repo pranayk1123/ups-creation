@@ -29,14 +29,10 @@ export default function Navbar() {
         <Link href="#contact" className="text-[#4a2c2a] hover:text-[#a35d58] text-xs tracking-widest uppercase font-bold transition-colors">
           Contact
         </Link>
-        {/* ADDED ADMIN LINK HERE */}
-        <Link href="/admin" className="text-[#4a2c2a] hover:text-[#a35d58] text-xs tracking-widest uppercase font-bold transition-colors">
-          Admin
-        </Link>
       </div>
 
-      {/* 3. Right Side: Menu Capsule */}
-      <div className="hidden lg:flex items-center gap-4 bg-[#4a2c2a]/10 backdrop-blur-md pl-6 pr-2 py-2 rounded-full border border-white/40 shadow-sm cursor-pointer hover:bg-[#4a2c2a]/20 transition-all">
+      {/* 3. Right Side: Menu Capsule WITH DROPDOWN */}
+      <div className="relative group hidden lg:flex items-center gap-4 bg-[#4a2c2a]/10 backdrop-blur-md pl-6 pr-2 py-2 rounded-full border border-white/40 shadow-sm cursor-pointer hover:bg-[#4a2c2a]/20 transition-all">
         <span className="text-[#4a2c2a] text-xs font-bold tracking-widest uppercase">Menu</span>
         <div className="w-9 h-9 rounded-full bg-[#a35d58] flex items-center justify-center shadow-md">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white">
@@ -44,15 +40,29 @@ export default function Navbar() {
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
         </div>
+
+        {/* 🔻 Dropdown Menu (Menu var mouse gelyavar disel) 🔻 */}
+        <div className="absolute right-0 top-full mt-3 hidden group-hover:flex flex-col bg-white border border-[#eed6d3] rounded-xl shadow-lg overflow-hidden w-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <Link href="/admin" className="px-5 py-3 text-sm font-bold text-[#4a2c2a] hover:bg-[#fceceb] hover:text-[#a35d58] transition-colors text-center">
+            Admin Panel
+          </Link>
+        </div>
       </div>
 
       {/* Mobile Menu Icon (Fakta chotya screen sathi) */}
-      <button className="md:hidden text-[#4a2c2a] bg-white/40 p-2.5 rounded-full backdrop-blur-md border border-white/50">
+      <button className="md:hidden text-[#4a2c2a] bg-white/40 p-2.5 rounded-full backdrop-blur-md border border-white/50 relative group">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
+
+        {/* 🔻 Mobile madhe pan Dropdown taklay 🔻 */}
+        <div className="absolute right-0 top-full mt-3 hidden group-hover:flex flex-col bg-white border border-[#eed6d3] rounded-xl shadow-lg overflow-hidden w-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <Link href="/admin" className="px-5 py-3 text-sm font-bold text-[#4a2c2a] hover:bg-[#fceceb] hover:text-[#a35d58] transition-colors text-center">
+            Admin Panel
+          </Link>
+        </div>
       </button>
 
     </div>
