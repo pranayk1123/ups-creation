@@ -19,7 +19,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(6);
   
-  // NAVIN: Popup sathi state
+  // Popup sathi state
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
   const [currentImage, setCurrentImage] = useState<string>('');
 
@@ -42,10 +42,8 @@ export default function HomePage() {
     setVisibleCount(prevCount => prevCount + 6);
   };
 
-  // NAVIN: Product var click kelyavar Popup open karnya sathi
   const openProductDetails = (product: ProductType) => {
     setSelectedProduct(product);
-    // Pahila photo set kara (Jar images array asel tar tithun, nahitar single image)
     setCurrentImage(product.images && product.images.length > 0 ? product.images[0] : (product.image || "/logo.jpg.jpeg"));
   };
 
@@ -82,13 +80,11 @@ export default function HomePage() {
                 {products.slice(0, visibleCount).map((product) => (
                   <div key={product._id} className="group bg-white rounded-none p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col">
                     
-                    {/* NAVIN: Image var click kelyavar Pop-up ughadel */}
                     <div 
                       onClick={() => openProductDetails(product)}
                       className="w-full h-80 bg-[#fdf7f7] mb-8 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500 cursor-pointer"
                     >
                       <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
-                      {/* Photo chya var ek chota icon disel ki multiple photos ahet */}
                       {product.images && product.images.length > 1 && (
                         <div className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm text-xs font-bold text-[#4a2c2a] px-2 py-1 rounded-full flex gap-1 items-center shadow-sm">
                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
@@ -126,7 +122,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 🚀 NAVIN: AMAZON STYLE POPUP (MODAL) 🚀 */}
+      {/* 🚀 AMAZON STYLE POPUP (MODAL) WITH WHATSAPP ENQUIRY 🚀 */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4 md:p-10">
           <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto flex flex-col md:flex-row relative shadow-2xl animate-fade-in-up">
@@ -141,12 +137,10 @@ export default function HomePage() {
             
             {/* Left Side: Images Gallery */}
             <div className="w-full md:w-1/2 bg-[#fdf7f7] p-6 md:p-10 flex flex-col gap-6">
-              {/* Main Large Image */}
               <div className="w-full aspect-square relative rounded-xl overflow-hidden bg-white border border-[#f5e1df] shadow-sm">
                 <Image src={currentImage} alt={selectedProduct.name} fill className="object-cover" />
               </div>
               
-              {/* Thumbnails Row (Multiple Photos) */}
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                 {(selectedProduct.images && selectedProduct.images.length > 0 
                   ? selectedProduct.images 
@@ -163,28 +157,85 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Side: Product Details */}
-            <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white">
-              <p className="text-xs font-bold tracking-[0.2em] uppercase text-[#a35d58] mb-3">UP's Creation</p>
-              <h2 className="text-4xl md:text-5xl font-serif text-[#4a2c2a] mb-4 leading-tight">{selectedProduct.name}</h2>
-              <p className="text-3xl font-serif text-[#a35d58] mb-8">{selectedProduct.price}</p>
-              
-              <div className="w-full h-[1px] bg-[#f5e1df] mb-8"></div>
-              
-              <h4 className="text-sm font-bold text-[#4a2c2a] uppercase tracking-wider mb-3">Product Description</h4>
-              <p className="text-[#6b4441] leading-relaxed mb-10 whitespace-pre-wrap font-light">{selectedProduct.desc}</p>
-              
-              <div className="mt-auto flex flex-col gap-4">
-                <button className="w-full py-4 bg-[#4a2c2a] text-white text-sm tracking-widest uppercase font-bold hover:bg-[#a35d58] transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 rounded-none">
-                  Enquire via WhatsApp
-                </button>
+            {/* Right Side: Product Details & WhatsApp Enquiry Options */}
+            <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-between bg-white overflow-y-auto max-h-[90vh]">
+              <div>
+                <p className="text-xs font-bold tracking-[0.2em] uppercase text-[#a35d58] mb-3">UP's Creation</p>
+                <h2 className="text-4xl md:text-5xl font-serif text-[#4a2c2a] mb-4 leading-tight">{selectedProduct.name}</h2>
+                <p className="text-3xl font-serif text-[#a35d58] mb-6">{selectedProduct.price}</p>
+                
+                <div className="w-full h-[1px] bg-[#f5e1df] mb-6"></div>
+                
+                <h4 className="text-sm font-bold text-[#4a2c2a] uppercase tracking-wider mb-2">Product Description</h4>
+                <p className="text-[#6b4441] leading-relaxed mb-6 whitespace-pre-wrap font-light text-sm">{selectedProduct.desc}</p>
               </div>
+
+              {/* WhatsApp Custom Enquiry Box */}
+              <WhatsAppEnquirySection product={selectedProduct} currentImage={currentImage} />
             </div>
 
           </div>
         </div>
       )}
 
+    </div>
+  );
+}
+
+// 💬 WhatsApp Enquiry Section Component with Custom Message & Options
+function WhatsAppEnquirySection({ product, currentImage }: { product: ProductType, currentImage: string }) {
+  const [customMsg, setCustomMsg] = useState("");
+  const [includePrice, setIncludePrice] = useState(true);
+
+  const handleWhatsAppSend = () => {
+    const phoneNumber = "919594790996"; // 👈 CHANGE THIS TO YOUR WHATSAPP NUMBER
+
+    let message = `Hello UP's Creation, I want to enquire about this product:\n\n`;
+    message += `*Product:* ${product.name}\n`;
+    if (includePrice && product.price) {
+      message += `*Price:* ${product.price}\n`;
+    }
+    message += `*Photo Link:* ${currentImage}\n`;
+
+    if (customMsg.trim() !== "") {
+      message += `*Custom Message:* ${customMsg}\n`;
+    }
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
+  };
+
+  return (
+    <div className="bg-[#fdf7f7] p-4 rounded-xl border border-[#f5e1df] flex flex-col gap-3 mt-4">
+      <h4 className="text-xs font-bold text-[#4a2c2a] uppercase tracking-wider">Enquire via WhatsApp</h4>
+      
+      <label className="flex items-center gap-2 text-sm text-[#6b4441] cursor-pointer select-none">
+        <input 
+          type="checkbox" 
+          checked={includePrice} 
+          onChange={(e) => setIncludePrice(e.target.checked)}
+          className="accent-[#a35d58] w-4 h-4"
+        />
+        Include Price in message
+      </label>
+
+      <textarea 
+        placeholder="Type custom color, size or message here (Optional)..." 
+        rows={2}
+        value={customMsg}
+        onChange={(e) => setCustomMsg(e.target.value)}
+        className="p-3 bg-white border border-[#eed6d3] rounded-lg text-sm outline-none focus:border-[#a35d58] text-[#4a2c2a]"
+      ></textarea>
+
+      <button 
+        onClick={handleWhatsAppSend}
+        className="w-full py-3.5 bg-[#4a2c2a] text-white text-sm tracking-widest uppercase font-bold hover:bg-[#a35d58] transition-all duration-300 shadow-md flex items-center justify-center gap-2 rounded-lg"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+        Send Enquiry via WhatsApp
+      </button>
     </div>
   );
 }
