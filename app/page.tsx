@@ -203,9 +203,13 @@ export default function HomePage() {
                       <h3 className="text-lg sm:text-2xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 line-clamp-1 group-hover:text-[#a35d58] transition-colors">{product.name}</h3>
                       <p className="text-[#6b4441] text-xs sm:text-sm font-light leading-relaxed mb-4 sm:mb-6 px-1 sm:px-4 mx-auto line-clamp-2">{product.desc}</p>
                     </div>
-                    <div className="flex flex-col items-center pt-3 sm:pt-4 border-t border-[#f5e1df]">
+                    
+                    {/* 💰 PROFESSIONAL PRICE & BUTTON STYLING */}
+                    <div className="flex flex-col items-center w-full pt-4 sm:pt-5 border-t border-[#f5e1df]">
                       {product.price && product.price.trim() !== '' && (
-                        <span className="text-base sm:text-xl font-serif text-[#a35d58] mb-2 sm:mb-4">{product.price}</span>
+                        <span className="text-[15px] sm:text-lg font-serif text-[#8c4f4a] mb-4 sm:mb-5 tracking-[0.05em]">
+                          {product.price}
+                        </span>
                       )}
                       <button
                         onClick={() => openProductDetails(product)}
@@ -214,6 +218,7 @@ export default function HomePage() {
                         View Details
                       </button>
                     </div>
+
                   </div>
                 ))}
               </div>
@@ -292,7 +297,9 @@ export default function HomePage() {
               <div className="mb-4">
                 <p className="text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase text-[#a35d58] mb-1 sm:mb-2">UP's Creation</p>
                 <h2 className="text-2xl sm:text-4xl md:text-5xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 leading-tight">{selectedProduct.name}</h2>
-                <p className="text-xl sm:text-3xl font-serif text-[#a35d58] mb-4">{selectedProduct.price}</p>
+                
+                {/* 💰 MODAL PRICE UPDATE */}
+                <p className="text-xl sm:text-2xl font-serif text-[#8c4f4a] mb-5 tracking-[0.05em]">{selectedProduct.price}</p>
 
                 <div className="w-full h-[1px] bg-[#f5e1df] mb-4"></div>
 
