@@ -14,6 +14,17 @@ interface ProductType {
   imgPosition: string;
 }
 
+// 💰 Helper Function for Price formatting
+const formatPrice = (price: string) => {
+  if (!price || price.trim() === '') return '';
+  const lowerPrice = price.toLowerCase();
+  // Jar aadhich rs kiva ₹ asel tar tasach thevaycha, nahitar ₹ add karaycha
+  if (lowerPrice.includes('rs') || lowerPrice.includes('₹') || lowerPrice.includes('rupee')) {
+    return price;
+  }
+  return `₹ ${price}`;
+};
+
 export default function HomePage() {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -103,16 +114,6 @@ export default function HomePage() {
     }
   };
 
-  // Helper Function for Price formatting
-  const formatPrice = (price: string) => {
-    if (!price || price.trim() === '') return '';
-    const lowerPrice = price.toLowerCase();
-    if (lowerPrice.includes('rs') || lowerPrice.includes('₹') || lowerPrice.includes('rupee')) {
-      return price;
-    }
-    return `₹ ${price}`;
-  };
-
   return (
     <div className="overflow-hidden w-full relative selection:bg-[#fceceb] selection:text-[#a35d58]">
       <section className="relative flex flex-col items-center justify-center min-h-screen w-full px-4 text-center bg-[#fdf7f7] overflow-hidden">
@@ -120,12 +121,15 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#fceceb]/60 via-transparent to-transparent pointer-events-none"></div>
 
         <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center space-y-6">
+
+          {/* Subtitle with Smooth Slide Down */}
           <div className="overflow-hidden">
             <p className="text-xs md:text-sm text-[#a35d58] tracking-[0.35em] uppercase font-semibold transform transition-all duration-1000 animate-fade-in-down">
               Handcrafted in Mumbai
             </p>
           </div>
 
+          {/* Main Title with Elegant Fade & Subtle Scale */}
           <div className="overflow-hidden">
             <h1 className="text-6xl md:text-8xl font-serif text-[#4a2c2a] leading-tight transform transition-all duration-1000 animate-fade-in-up">
               Handmade <br />
@@ -135,10 +139,12 @@ export default function HomePage() {
             </h1>
           </div>
 
+          {/* Description with Soft Fade */}
           <p className="text-base md:text-lg text-[#6b4441] max-w-xl mx-auto leading-relaxed font-light opacity-85 pt-2 animate-fade-in delay-200">
             Discover our premium collection of crochet artistry, bespoke gifts, and elegant home decor. Stitched meticulously for your special moments.
           </p>
 
+          {/* Luxury Hover Button with Smooth Shadow Lift */}
           <div className="pt-6 animate-fade-in delay-300">
             <Link
               href="#products"
@@ -153,6 +159,7 @@ export default function HomePage() {
               </span>
             </Link>
           </div>
+
         </div>
       </section>
 
@@ -181,19 +188,13 @@ export default function HomePage() {
             <div className="flex flex-col items-center w-full mt-10">
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
                 {products.slice(0, visibleCount).map((product) => (
-                  <div key={product._id} className="group bg-white rounded-xl p-3 sm:p-5 shadow-sm hover:shadow-xl transition-all duration-500 border border-[#f5e1df] flex flex-col hover:-translate-y-1.5">
+                  <div key={product._id} className="group bg-white rounded-xl p-3 sm:p-6 shadow-sm hover:shadow-xl transition-all duration-500 border border-[#f5e1df] flex flex-col hover:-translate-y-1.5">
 
-                    {/* Image Container */}
                     <div
                       onClick={() => openProductDetails(product)}
-                      className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-3 sm:mb-5 relative overflow-hidden rounded-lg flex items-center justify-center group-hover:bg-[#fceceb] transition-all duration-500 cursor-pointer"
+                      className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-4 sm:mb-8 relative overflow-hidden rounded-lg flex items-center justify-center group-hover:bg-[#fceceb] transition-all duration-500 cursor-pointer"
                     >
                       <Image src={product.image || "/logo.jpg.jpeg"} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-700 ease-out group-hover:scale-105" />
-
-                      {/* 🏷️ CHHOTA TRANSPARENT WATERMARK LOGO ON PRODUCT CARD (TOP-LEFT) */}
-                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border border-white/60 shadow-sm opacity-80 backdrop-blur-md pointer-events-none z-10">
-                        <Image src="/logo.jpg.jpeg" alt="UP's Creation Logo" fill className="object-cover" />
-                      </div>
 
                       {/* Multiple Images Count Badge */}
                       {product.images && product.images.length > 1 && (
@@ -204,33 +205,26 @@ export default function HomePage() {
                       )}
                     </div>
 
-                    {/* Text & Price Container */}
-                    <div className="text-center flex-grow flex flex-col justify-between">
-                      <div>
-                        <h3 className="text-lg sm:text-[22px] font-serif text-[#4a2c2a] mb-2 line-clamp-1 group-hover:text-[#a35d58] transition-colors">{product.name}</h3>
-                        <p className="text-[#6b4441] text-xs sm:text-sm font-light leading-relaxed mb-4 px-1 sm:px-4 mx-auto line-clamp-2">{product.desc}</p>
-                      </div>
-                      
-                      {/* 💰 ELEGANT PRICE & BUTTON LAYOUT (Like Reference Image) */}
-                      <div className="w-full mt-auto">
-                        {/* Thin separator line */}
-                        <div className="w-[85%] h-[1px] bg-[#f5e1df] mx-auto mb-3 sm:mb-4"></div>
-                        
-                        {/* Formatted Price */}
-                        {product.price && product.price.trim() !== '' && (
-                          <p className="text-[14px] sm:text-[16px] font-serif text-[#6b4441] mb-3 sm:mb-4 tracking-wide">
-                            {formatPrice(product.price)}
-                          </p>
-                        )}
-                        
-                        <button
-                          onClick={() => openProductDetails(product)}
-                          className="w-full py-2.5 sm:py-3 bg-transparent text-[#4a2c2a] text-[11px] sm:text-[12px] tracking-[0.15em] uppercase rounded-full border border-[#4a2c2a] hover:bg-[#4a2c2a] hover:text-white transition-all duration-300 shadow-sm"
-                        >
-                          View Details
-                        </button>
-                      </div>
+                    <div className="text-center flex-grow">
+                      <h3 className="text-lg sm:text-2xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 line-clamp-1 group-hover:text-[#a35d58] transition-colors">{product.name}</h3>
+                      <p className="text-[#6b4441] text-xs sm:text-sm font-light leading-relaxed mb-4 sm:mb-6 px-1 sm:px-4 mx-auto line-clamp-2">{product.desc}</p>
                     </div>
+                    
+                    {/* 💰 PROFESSIONAL PRICE & BUTTON STYLING */}
+                    <div className="flex flex-col items-center pt-4 sm:pt-5 border-t border-[#f5e1df]">
+                      {product.price && product.price.trim() !== '' && (
+                        <span className="text-[15px] sm:text-[17px] font-serif text-[#a35d58] mb-3 sm:mb-4 tracking-wide">
+                          {formatPrice(product.price)}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => openProductDetails(product)}
+                        className="w-full py-2.5 sm:py-3 bg-transparent text-[#4a2c2a] text-[11px] sm:text-sm tracking-widest uppercase rounded-full border border-[#4a2c2a] hover:bg-[#4a2c2a] hover:text-white transition-all duration-300 shadow-sm"
+                      >
+                        View Details
+                      </button>
+                    </div>
+
                   </div>
                 ))}
               </div>
@@ -245,7 +239,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* POPUP MODAL WITH WATERMARK LOGO & REFINED PRICE */}
+      {/* POPUP MODAL */}
       {selectedProduct && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-2 sm:p-6 md:p-10 transition-opacity duration-300">
           <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[92vh] flex flex-col md:flex-row relative shadow-2xl overflow-y-auto md:overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-300">
@@ -265,6 +259,7 @@ export default function HomePage() {
                 onTouchEnd={onTouchEnd}
                 className="w-full aspect-square relative rounded-xl overflow-hidden bg-white border border-[#f5e1df] shadow-sm cursor-grab active:cursor-grabbing"
               >
+                {/* Amazon Style Sliding Track */}
                 <div
                   className="flex h-full transition-transform duration-500 ease-out"
                   style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
@@ -276,11 +271,7 @@ export default function HomePage() {
                   ))}
                 </div>
 
-                {/* 🏷️ WATERMARK LOGO ON MODAL MAIN IMAGE (TOP-LEFT) */}
-                <div className="absolute top-3 left-3 w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border border-white/60 shadow-sm opacity-80 backdrop-blur-md pointer-events-none z-10">
-                  <Image src="/logo.jpg.jpeg" alt="UP's Creation Logo" fill className="object-cover" />
-                </div>
-
+                {/* Chhota Number Badge */}
                 {imagesList.length > 1 && (
                   <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md text-white text-[9px] font-medium px-2 py-0.5 rounded-full pointer-events-none md:hidden shadow-sm z-10 tracking-widest">
                     {currentImageIndex + 1} / {imagesList.length}
@@ -288,6 +279,7 @@ export default function HomePage() {
                 )}
               </div>
 
+              {/* Thumbnails Horizontal Scroll */}
               <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin">
                 {imagesList.map((img, idx) => (
                   <button
@@ -309,7 +301,7 @@ export default function HomePage() {
                 
                 {/* 💰 MODAL ELEGANT PRICE */}
                 {selectedProduct.price && selectedProduct.price.trim() !== '' && (
-                  <p className="text-xl sm:text-2xl font-serif text-[#6b4441] mb-5 tracking-wide">
+                  <p className="text-xl sm:text-2xl font-serif text-[#a35d58] mb-5 tracking-wide">
                     {formatPrice(selectedProduct.price)}
                   </p>
                 )}
@@ -347,10 +339,8 @@ function WhatsAppEnquirySection({ product, currentImage }: { product: ProductTyp
     let message = `Hello UP's Creation, I want to enquire about this product:\n\n`;
     message += `*Product:* ${product.name}\n`;
     if (hasValidPrice && includePrice) {
-      // Send the formatted price on WhatsApp too
-      const lowerP = product.price.toLowerCase();
-      const finalPrice = lowerP.includes('rs') || lowerP.includes('₹') ? product.price : `₹ ${product.price}`;
-      message += `*Price:* ${finalPrice}\n`;
+      // 💰 Send formatted price on WhatsApp
+      message += `*Price:* ${formatPrice(product.price)}\n`;
     }
     message += `*Photo Link:* ${currentImage}\n`;
 
