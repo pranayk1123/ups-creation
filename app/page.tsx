@@ -118,31 +118,32 @@ export default function HomePage() {
     <div className="overflow-hidden w-full relative selection:bg-[#fceceb] selection:text-[#a35d58]">
       <section className="relative flex flex-col items-center justify-center min-h-screen w-full px-4 text-center bg-[#fdf7f7] overflow-hidden">
         
-        {/* 🌟 ADJUSTED BACKGROUND IMAGE WITH BETTER VISIBILITY */}
+        {/* 🌟 ADJUSTED BACKGROUND IMAGE FOR MOBILE & DESKTOP */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/hero-bg.jpg"
             alt="Handmade Crochet Background"
             fill
             priority
-            className="object-cover opacity-100 mix-blend-multiply" // Increased opacity and added mix-blend to merge well with background color
+            // On mobile we use object-cover with top position to avoid center crop, on desktop it stays cover center
+            className="object-cover object-top sm:object-center opacity-100 mix-blend-multiply" 
           />
           {/* Lighter gradient overlay so the image shows through clearly */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#fceceb]/40 to-[#fdf7f7]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#fdf7f7]/40 via-[#fceceb]/60 to-[#fdf7f7]"></div>
         </div>
 
         <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center space-y-6 relative">
 
           {/* Subtitle with Smooth Slide Down */}
           <div className="overflow-hidden">
-            <p className="text-xs md:text-sm text-[#a35d58] tracking-[0.35em] uppercase font-semibold transform transition-all duration-1000 animate-fade-in-down drop-shadow-sm bg-white/40 px-3 py-1 rounded-full backdrop-blur-sm">
+            <p className="text-xs md:text-sm text-[#a35d58] tracking-[0.35em] uppercase font-semibold transform transition-all duration-1000 animate-fade-in-down drop-shadow-sm bg-white/50 px-4 py-1.5 rounded-full backdrop-blur-sm">
               Handcrafted in Mumbai
             </p>
           </div>
 
           {/* Main Title with Elegant Fade & Subtle Scale */}
           <div className="overflow-hidden">
-            <h1 className="text-6xl md:text-8xl font-serif text-[#4a2c2a] leading-tight transform transition-all duration-1000 animate-fade-in-up drop-shadow-lg">
+            <h1 className="text-6xl md:text-8xl font-serif text-[#4a2c2a] leading-tight transform transition-all duration-1000 animate-fade-in-up drop-shadow-md">
               Handmade <br />
               <span className="italic text-[#a35d58] font-light inline-block hover:scale-105 transition-transform duration-500 cursor-default">
                 with Love
@@ -151,7 +152,7 @@ export default function HomePage() {
           </div>
 
           {/* Description with Soft Fade */}
-          <p className="text-base md:text-lg text-[#6b4441] max-w-xl mx-auto leading-relaxed font-medium pt-2 animate-fade-in delay-200 drop-shadow-md bg-white/2 p-2 rounded-lg backdrop-blue-blur-sm">
+          <p className="text-base md:text-lg text-[#6b4441] max-w-xl mx-auto leading-relaxed font-medium pt-2 animate-fade-in delay-200 drop-shadow-sm p-3 sm:p-2 rounded-xl sm:rounded-lg backdrop-blur-sm">
             Discover our premium collection of crochet artistry, bespoke gifts, and elegant home decor. Stitched meticulously for your special moments.
           </p>
 
@@ -159,7 +160,7 @@ export default function HomePage() {
           <div className="pt-6 animate-fade-in delay-300">
             <Link
               href="#products"
-              className="group relative inline-flex items-center justify-center px-10 py-4 bg-[#4a2c2a] text-[#fdf7f7] text-xs tracking-[0.25em] uppercase font-medium rounded-full overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 border border-transparent hover:border-[#a35d58]"
+              className="group relative inline-flex items-center justify-center px-10 py-4 bg-[#4a2c2a] text-[#fdf7f7] text-xs tracking-[0.25em] uppercase font-medium rounded-full overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 border border-transparent hover:border-[#a35d58]"
             >
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-[#a35d58] to-[#4a2c2a] opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"></span>
               <span className="relative z-10 flex items-center gap-2">
