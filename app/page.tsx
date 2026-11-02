@@ -151,7 +151,7 @@ export default function HomePage() {
           </div>
 
           {/* Description with Soft Fade */}
-          <p className="text-base md:text-lg text-[#6b4441] max-w-xl mx-auto leading-relaxed font-medium pt-2 animate-fade-in delay-200 drop-shadow-md bg-white/30 p-2 rounded-lg backdrop-blur-sm">
+          <p className="text-base md:text-lg text-[#6b4441] max-w-xl mx-auto leading-relaxed font-medium pt-2 animate-fade-in delay-200 drop-shadow-md bg-white/2 p-2 rounded-lg backdrop-blue-blur-sm">
             Discover our premium collection of crochet artistry, bespoke gifts, and elegant home decor. Stitched meticulously for your special moments.
           </p>
 
