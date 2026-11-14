@@ -1,7 +1,7 @@
 "use client"; 
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface ProductType {
   _id: string;
@@ -13,7 +13,7 @@ interface ProductType {
   imgPosition: string;
 }
 
-// 💰 Helper Function for Price formatting (MISSING HOTA TO ITHE ADD KELAY)
+// Helper Function for Price formatting
 const formatPrice = (price: string) => {
   if (!price || price.trim() === '') return '';
   const lowerPrice = price.toLowerCase();
@@ -34,15 +34,25 @@ export default function AdminPage() {
   
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [newProduct, setNewProduct] = useState({
-    name: '', price: '', desc: '', image: '', imgPosition: 'center',
+    name: '', price: '', desc: '', image: '', imgPosition: '50% 50%_1',
   });
   
   const [currentImages, setCurrentImages] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   
-  // 🎛️ Live Image Preview & Slider State
+  // Live Image Preview & 3D Slider State
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [imgPosPercent, setImgPosPercent] = useState<number>(50);
+  const [imgPosX, setImgPosX] = useState<number>(50);
+  const [imgPosY, setImgPosY] = useState<number>(50);
+  const [imgScale, setImgScale] = useState<number>(1);
+
+  // Touch and Drag states for interactive image adjustment
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [posStart, setPosStart] = useState({ x: 50, y: 50 });
+  const [pinchStartDist, setPinchStartDist] = useState<number | null>(null);
+  const [scaleStart, setScaleStart] = useState(1);
 
   useEffect(() => {
     if (sessionStorage.getItem("isAdmin") === "true") {
@@ -88,13 +98,26 @@ export default function AdminPage() {
     }
   };
 
+  // Fixed: Append new files to the array instead of replacing, to support multiple uploads properly
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const filesArray = Array.from(e.target.files);
-      setSelectedFiles(filesArray);
+      setSelectedFiles((prev) => [...prev, ...filesArray]);
       setNewProduct({ ...newProduct, image: '' }); 
       setPreviewImage(URL.createObjectURL(filesArray[0]));
     }
+  };
+
+  const handleAddProductClick = () => {
+    setEditingProductId(null);
+    setNewProduct({ name: '', price: '', desc: '', image: '', imgPosition: '50% 50%_1' });
+    setCurrentImages([]);
+    setSelectedFiles([]);
+    setPreviewImage(null);
+    setImgPosX(50);
+    setImgPosY(50);
+    setImgScale(1);
+    setIsFormOpen(true); 
   };
 
   const handleOpenEdit = (product: ProductType) => {
@@ -104,7 +127,7 @@ export default function AdminPage() {
       price: product.price === ' ' ? '' : product.price,
       desc: product.desc,
       image: '',
-      imgPosition: product.imgPosition || 'center',
+      imgPosition: product.imgPosition || '50% 50%_1',
     });
     
     const existingImages = product.images && product.images.length > 0 ? product.images : [product.image];
@@ -112,16 +135,34 @@ export default function AdminPage() {
     setPreviewImage(existingImages[0] || null);
     setSelectedFiles([]);
     
-    let defaultPos = 50;
+    let defaultX = 50;
+    let defaultY = 50;
+    let defaultScale = 1;
+    
     if (product.imgPosition) {
-      if (product.imgPosition === 'top') defaultPos = 0;
-      else if (product.imgPosition === 'bottom') defaultPos = 100;
-      else if (product.imgPosition.includes('%')) {
-        const match = product.imgPosition.match(/\d+/);
-        if (match) defaultPos = parseInt(match[0]);
+      const parts = product.imgPosition.split('_');
+      const posStr = parts[0];
+      if (parts[1]) defaultScale = parseFloat(parts[1]);
+
+      if (posStr === 'top') { defaultX = 50; defaultY = 0; }
+      else if (posStr === 'bottom') { defaultX = 50; defaultY = 100; }
+      else if (posStr === 'left') { defaultX = 0; defaultY = 50; }
+      else if (posStr === 'right') { defaultX = 100; defaultY = 50; }
+      else if (posStr.includes('%')) {
+        const matches = posStr.match(/\d+/g);
+        if (matches && matches.length >= 2) {
+          defaultX = parseInt(matches[0]);
+          defaultY = parseInt(matches[1]);
+        } else if (matches && matches.length === 1) {
+          defaultX = 50;
+          defaultY = parseInt(matches[0]);
+        }
       }
     }
-    setImgPosPercent(defaultPos);
+    
+    setImgPosX(defaultX);
+    setImgPosY(defaultY);
+    setImgScale(defaultScale);
     setIsFormOpen(true);
   };
 
@@ -129,22 +170,33 @@ export default function AdminPage() {
     const updatedImages = currentImages.filter((_, idx) => idx !== indexToRemove);
     setCurrentImages(updatedImages);
     if (updatedImages.length > 0) setPreviewImage(updatedImages[0]);
+    else if (selectedFiles.length > 0) setPreviewImage(URL.createObjectURL(selectedFiles[0]));
     else setPreviewImage(null);
   };
 
+  // Fixed: Allow removal of newly uploaded files from the preview queue
+  const handleRemoveSelectedFile = (indexToRemove: number) => {
+    const updatedFiles = selectedFiles.filter((_, idx) => idx !== indexToRemove);
+    setSelectedFiles(updatedFiles);
+    if (updatedFiles.length > 0) setPreviewImage(URL.createObjectURL(updatedFiles[0]));
+    else if (currentImages.length > 0) setPreviewImage(currentImages[0]);
+    else setPreviewImage(newProduct.image || null);
+  };
+
   const resetForm = () => {
-    setIsFormOpen(false);
+    setIsFormOpen(false); 
     setEditingProductId(null);
-    setNewProduct({ name: '', price: '', desc: '', image: '', imgPosition: 'center' });
+    setNewProduct({ name: '', price: '', desc: '', image: '', imgPosition: '50% 50%_1' });
     setCurrentImages([]);
     setSelectedFiles([]);
     setPreviewImage(null);
-    setImgPosPercent(50);
+    setImgPosX(50);
+    setImgPosY(50);
+    setImgScale(1);
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     let uploadedUrls = [...currentImages];
 
     if (selectedFiles.length > 0) {
@@ -169,7 +221,7 @@ export default function AdminPage() {
 
     const finalImage = uploadedUrls.length > 0 ? uploadedUrls[0] : '/logo.jpg.jpeg';
     const finalPrice = newProduct.price.trim() === '' ? ' ' : newProduct.price;
-    const finalImgPosition = `center ${imgPosPercent}%`; 
+    const finalImgPosition = `${imgPosX}% ${imgPosY}%_${imgScale}`; 
 
     try {
       const url = editingProductId ? `/api/products?id=${editingProductId}` : '/api/products';
@@ -207,6 +259,72 @@ export default function AdminPage() {
     }
   };
 
+  // --------------------------------------------------------
+  // DRAG AND PINCH-TO-ZOOM LOGIC FOR IMAGE ADJUSTER
+  // --------------------------------------------------------
+  const getTouchDistance = (touches: React.TouchList) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      setPinchStartDist(getTouchDistance(e.touches));
+      setScaleStart(imgScale);
+    } else if (e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      setPosStart({ x: imgPosX, y: imgPosY });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchStartDist) {
+      const currentDist = getTouchDistance(e.touches);
+      const scaleDiff = (currentDist / pinchStartDist) - 1;
+      const newScale = Math.min(Math.max(1, scaleStart + scaleDiff), 3);
+      setImgScale(Number(newScale.toFixed(2)));
+    } else if (e.touches.length === 1 && isDragging) {
+      const deltaX = e.touches[0].clientX - dragStart.x;
+      const deltaY = e.touches[0].clientY - dragStart.y;
+      const sensitivity = 0.3; 
+      const newX = Math.min(Math.max(0, posStart.x - deltaX * sensitivity), 100);
+      const newY = Math.min(Math.max(0, posStart.y - deltaY * sensitivity), 100);
+      setImgPosX(Math.round(newX));
+      setImgPosY(Math.round(newY));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setPinchStartDist(null);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+    setPosStart({ x: imgPosX, y: imgPosY });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
+    const sensitivity = 0.3; 
+    const newX = Math.min(Math.max(0, posStart.x - deltaX * sensitivity), 100);
+    const newY = Math.min(Math.max(0, posStart.y - deltaY * sensitivity), 100);
+    setImgPosX(Math.round(newX));
+    setImgPosY(Math.round(newY));
+  };
+
+  const handleMouseUp = () => setIsDragging(false);
+
+  const handleWheel = (e: React.WheelEvent) => {
+    const scaleChange = e.deltaY * -0.002;
+    setImgScale((prev) => Number(Math.min(Math.max(1, prev + scaleChange), 3).toFixed(2)));
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fdf7f7] px-4 pt-28">
@@ -224,11 +342,11 @@ export default function AdminPage() {
     <div className="min-h-screen bg-[#fdf7f7] pb-10 pt-28 sm:pt-32 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         
-        {/* 📱 RESPONSIVE ADMIN HEADER */}
+        {/* Responsive Admin Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 sm:mb-10 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-[#f5e1df]">
           <h1 className="text-2xl sm:text-3xl font-serif text-[#4a2c2a]">Admin Dashboard</h1>
           <div className="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
-            <button onClick={resetForm} className="flex-1 sm:flex-none px-6 py-2.5 bg-[#a35d58] text-white rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm shadow-md hover:bg-[#4a2c2a] transition-all text-center">
+            <button onClick={handleAddProductClick} className="flex-1 sm:flex-none px-6 py-2.5 bg-[#a35d58] text-white rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm shadow-md hover:bg-[#4a2c2a] transition-all text-center">
               + Add Product
             </button>
             <button onClick={handleLogout} className="flex-1 sm:flex-none px-6 py-2.5 bg-transparent text-[#4a2c2a] border border-[#4a2c2a] rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm hover:bg-[#fceceb] transition-all text-center">
@@ -237,7 +355,7 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* 📝 ADD / EDIT MODAL FORM */}
+        {/* Add / Edit Modal Form */}
         {isFormOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-6">
             <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl max-w-lg w-full border border-[#f5e1df] max-h-[92vh] overflow-y-auto">
@@ -259,15 +377,17 @@ export default function AdminPage() {
                   <input type="text" placeholder="e.g. 299" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-[#fdf7f7] outline-none focus:border-[#a35d58] text-[#4a2c2a]" />
                 </div>
                 
-                {/* 📸 IMAGE UPLOAD SECTION */}
+                {/* Image Upload Section */}
                 <div className="flex flex-col gap-3 p-4 bg-[#fdf7f7] border border-[#eed6d3] rounded-xl">
                   <label className="text-sm text-[#4a2c2a] font-bold">Upload Photos</label>
                   
-                  {currentImages.length > 0 && (
+                  {/* Fixed: Display BOTH existing images and newly selected files */}
+                  {(currentImages.length > 0 || selectedFiles.length > 0) && (
                     <div className="flex flex-wrap gap-2 mb-2">
+                      {/* Existing DB Images */}
                       {currentImages.map((imgUrl, idx) => (
-                        <div key={idx} className="relative w-14 h-14 rounded-md overflow-hidden border border-[#a35d58]/40 shadow-sm cursor-pointer" onClick={() => setPreviewImage(imgUrl)}>
-                          <Image src={imgUrl} alt={`Current ${idx}`} fill className="object-cover" />
+                        <div key={`existing-${idx}`} className="relative w-14 h-14 rounded-md overflow-hidden border border-[#a35d58]/40 shadow-sm cursor-pointer" onClick={() => setPreviewImage(imgUrl)}>
+                          <img src={imgUrl} alt={`Current ${idx}`} className="w-full h-full object-cover" />
                           <button 
                             type="button" 
                             onClick={(e) => { e.stopPropagation(); handleRemoveExistingImage(idx); }}
@@ -275,6 +395,20 @@ export default function AdminPage() {
                           >✕</button>
                         </div>
                       ))}
+                      {/* Newly Uploaded Files */}
+                      {selectedFiles.map((file, idx) => {
+                        const tempUrl = URL.createObjectURL(file);
+                        return (
+                          <div key={`new-${idx}`} className="relative w-14 h-14 rounded-md overflow-hidden border border-[#a35d58]/40 shadow-sm cursor-pointer" onClick={() => setPreviewImage(tempUrl)}>
+                            <img src={tempUrl} alt={`New ${idx}`} className="w-full h-full object-cover" />
+                            <button 
+                              type="button" 
+                              onClick={(e) => { e.stopPropagation(); handleRemoveSelectedFile(idx); }}
+                              className="absolute top-0 right-0 bg-red-500 text-white w-5 h-5 flex items-center justify-center text-[10px] font-bold hover:bg-red-700"
+                            >✕</button>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
 
@@ -284,49 +418,70 @@ export default function AdminPage() {
                   
                   <input type="text" placeholder="Paste Image URL here..." value={newProduct.image} onChange={(e) => { 
                     setNewProduct({...newProduct, image: e.target.value}); 
-                    setSelectedFiles([]); 
                     setPreviewImage(e.target.value); 
                   }} className="p-2.5 border border-[#eed6d3] rounded-lg bg-white text-sm outline-none focus:border-[#a35d58]" />
                 </div>
 
-                {/* 🎛️ LIVE IMAGE POSITION PREVIEW & ADJUSTER */}
+                {/* 3D Live Image Position Preview & Adjuster */}
                 <div className="flex flex-col gap-3 p-4 bg-white border border-[#eed6d3] rounded-xl shadow-sm">
                   <div className="flex flex-col">
-                    <label className="text-sm text-[#4a2c2a] font-bold">Adjust Main Photo Display</label>
-                    <p className="text-[10px] text-[#6b4441] mt-0.5">Website var photo kasa disel te khali bagha ani slider halavun adjust kara.</p>
+                    <label className="text-sm text-[#4a2c2a] font-bold">Interactive Adjuster</label>
+                    <p className="text-[10px] text-[#6b4441] mt-0.5">Drag to move or pinch to zoom (works on mobile too), or use the sliders.</p>
                   </div>
 
-                  <div className="relative w-full h-44 sm:h-48 bg-[#fdf7f7] rounded-lg overflow-hidden border-2 border-dashed border-[#a35d58]/40 shadow-inner flex items-center justify-center">
+                  <div 
+                    ref={previewRef}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    onWheel={handleWheel}
+                    className="relative w-full h-44 sm:h-80 bg-[#fdf7f7] rounded-lg overflow-hidden border border-[#eed6d3] cursor-move touch-none shadow-inner"
+                  >
                     {previewImage ? (
-                      <Image
+                      /* Fixed: Replaced Next.js <Image> with native <img> in admin preview to prevent URL crashing errors instantly */
+                      <img
                         src={previewImage}
                         alt="Live Preview"
-                        fill
-                        className="object-cover"
-                        style={{ objectPosition: `center ${imgPosPercent}%` }}
+                        className="absolute w-full h-full object-cover pointer-events-none"
+                        style={{ 
+                          objectPosition: `${imgPosX}% ${imgPosY}%`,
+                          transformOrigin: `${imgPosX}% ${imgPosY}%`, 
+                          transform: `scale(${imgScale})`
+                        }}
                       />
                     ) : (
-                      <div className="text-xs text-[#a35d58]/60 font-bold flex flex-col items-center">
-                        <span className="text-2xl mb-1">🖼️</span> No image selected
+                      <div className="w-full h-full flex flex-col items-center justify-center text-xs text-[#a35d58]/60 font-bold">
+                        <span className="text-3xl mb-2">🖼️</span> No image selected
                       </div>
                     )}
                   </div>
 
                   {previewImage && (
-                    <div className="flex flex-col gap-2 mt-2">
-                      <div className="flex justify-between text-[9px] font-bold text-[#a35d58] uppercase tracking-widest px-1">
-                        <span>Top (0%)</span>
-                        <span>Center (50%)</span>
-                        <span>Bottom (100%)</span>
+                    <div className="flex flex-col gap-4 mt-3">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between text-[10px] font-bold text-[#a35d58] uppercase tracking-widest px-1">
+                          <span>Left</span><span>Horizontal (X)</span><span>Right</span>
+                        </div>
+                        <input type="range" min="0" max="100" value={imgPosX} onChange={(e) => setImgPosX(Number(e.target.value))} className="w-full h-2 bg-[#eed6d3] rounded-lg appearance-none cursor-pointer accent-[#a35d58]" />
                       </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={imgPosPercent}
-                        onChange={(e) => setImgPosPercent(Number(e.target.value))}
-                        className="w-full h-2 bg-[#eed6d3] rounded-lg appearance-none cursor-pointer accent-[#a35d58]"
-                      />
+
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between text-[10px] font-bold text-[#a35d58] uppercase tracking-widest px-1">
+                          <span>Top</span><span>Vertical (Y)</span><span>Bottom</span>
+                        </div>
+                        <input type="range" min="0" max="100" value={imgPosY} onChange={(e) => setImgPosY(Number(e.target.value))} className="w-full h-2 bg-[#eed6d3] rounded-lg appearance-none cursor-pointer accent-[#a35d58]" />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <div className="flex justify-between text-[10px] font-bold text-[#a35d58] uppercase tracking-widest px-1">
+                          <span>Default</span><span>Zoom (3D Scale)</span><span>Zoomed In</span>
+                        </div>
+                        <input type="range" min="1" max="3" step="0.05" value={imgScale} onChange={(e) => setImgScale(Number(e.target.value))} className="w-full h-2 bg-[#eed6d3] rounded-lg appearance-none cursor-pointer accent-[#a35d58]" />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -345,7 +500,7 @@ export default function AdminPage() {
           </div>
         )}
         
-        {/* 📱 2-COLUMN GRID FOR MOBILE, 3-COLUMN FOR DESKTOP */}
+        {/* Product Grid */}
         {isLoading ? (
           <div className="text-center text-[#a35d58] font-bold my-20 animate-pulse text-lg tracking-widest uppercase">Loading creations...</div>
         ) : products.length === 0 ? (
@@ -366,9 +521,13 @@ export default function AdminPage() {
   );
 }
 
-// 📱 Admin Product Card
+// Admin Product Card Component
 function AdminProductCard({ product, handleDeleteProduct, handleOpenEdit }: { product: ProductType, handleDeleteProduct: (id: string) => void, handleOpenEdit: (p: ProductType) => void }) {
   const [activeImage, setActiveImage] = useState(product.images?.[0] || product.image || "/logo.jpg.jpeg");
+
+  const posParts = (product.imgPosition || "50% 50%_1").split('_');
+  const objPos = posParts[0];
+  const objScale = posParts[1] || '1';
 
   return (
     <div className="group bg-white rounded-2xl p-3 sm:p-5 shadow-sm hover:shadow-xl transition-all duration-500 border border-[#f5e1df] flex flex-col relative overflow-hidden">
@@ -382,8 +541,20 @@ function AdminProductCard({ product, handleDeleteProduct, handleOpenEdit }: { pr
         </button>
       </div>
       
-      <div className="w-full h-44 sm:h-64 bg-[#fdf7f7] mb-3 sm:mb-4 relative overflow-hidden rounded-xl flex items-center justify-center border border-[#f5e1df]">
-        <Image src={activeImage} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
+      <div className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-3 sm:mb-4 relative overflow-hidden rounded-lg flex items-center justify-center border border-[#f5e1df]">
+        <Image 
+          src={activeImage} 
+          alt={product.name} 
+          fill 
+          sizes="(max-width: 768px) 50vw, 33vw" 
+          style={{ 
+            objectFit: "cover", 
+            objectPosition: objPos,
+            transformOrigin: objPos, 
+            transform: `scale(${objScale})` 
+          }} 
+          className="transition-transform duration-500 group-hover:opacity-90" 
+        />  
       </div>
 
       {product.images && product.images.length > 1 && (
