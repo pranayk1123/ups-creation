@@ -12,13 +12,13 @@ interface ProductType {
   image: string;
   images?: string[];
   imgPosition: string;
+  category?: string;
 }
 
 // 💰 Helper Function for Price formatting
 const formatPrice = (price: string) => {
   if (!price || price.trim() === '') return '';
   const lowerPrice = price.toLowerCase();
-  // Jar aadhich rs kiva ₹ asel tar tasach thevaycha, nahitar ₹ add karaycha
   if (lowerPrice.includes('rs') || lowerPrice.includes('₹') || lowerPrice.includes('rupee')) {
     return price;
   }
@@ -29,6 +29,10 @@ export default function HomePage() {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(6);
+
+  // 🔍 Search & Category Filter States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
 
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
@@ -114,34 +118,59 @@ export default function HomePage() {
     }
   };
 
+  // 🧠 SMART FILTERING LOGIC 
+  const categories = ["All", "Clips & Bows", "Toran & Festive", "Flowers & Gifts"];
+
+  const checkCategoryMatch = (product: ProductType, cat: string, search: string) => {
+    const textToSearch = `${product.name} ${product.desc} ${product.category || ''}`.toLowerCase();
+    const matchesSearch = textToSearch.includes(search.toLowerCase());
+
+    if (!matchesSearch) return false;
+
+    if (cat === "All") return true;
+    if (cat === "Clips & Bows") {
+      return textToSearch.includes("clip") || textToSearch.includes("hair") || textToSearch.includes("bow") || textToSearch.includes("scrunchie") || textToSearch.includes("band") || textToSearch.includes("pin") || textToSearch.includes("tic tac");
+    }
+    if (cat === "Toran & Festive") {
+      return textToSearch.includes("toran") || textToSearch.includes("subh") || textToSearch.includes("labh") || textToSearch.includes("decor") || textToSearch.includes("hanging") || textToSearch.includes("festive") || textToSearch.includes("diwali") || textToSearch.includes("coaster");
+    }
+    if (cat === "Flowers & Gifts") {
+      return textToSearch.includes("flower") || textToSearch.includes("rose") || textToSearch.includes("bouquet") || textToSearch.includes("keychain") || textToSearch.includes("gift") || textToSearch.includes("plush") || textToSearch.includes("sunflower") || textToSearch.includes("lily");
+    }
+    return true;
+  };
+
+  const filteredProducts = products.filter(p => checkCategoryMatch(p, activeCategory, searchQuery));
+
+  const getCategoryCount = (cat: string) => {
+    return products.filter(p => checkCategoryMatch(p, cat, searchQuery)).length;
+  };
+
   return (
     <div className="overflow-hidden w-full relative selection:bg-[#fceceb] selection:text-[#a35d58]">
+      
+      {/* 🌟 HERO SECTION */}
       <section className="relative flex flex-col items-center justify-center min-h-screen w-full px-4 text-center bg-[#fdf7f7] overflow-hidden">
         
-        {/* 🌟 ADJUSTED BACKGROUND IMAGE FOR MOBILE & DESKTOP */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/hero-bg.jpg"
             alt="Handmade Crochet Background"
             fill
             priority
-            // On mobile we use object-cover with top position to avoid center crop, on desktop it stays cover center
-            className="object-cover object-top sm:object-center opacity-100 mix-blend-multiply" 
+            className="object-contain sm:object-cover sm:object-center opacity-80 mix-blend-multiply brightness-90 grayscale-[10%]" 
           />
-          {/* Lighter gradient overlay so the image shows through clearly */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#fdf7f7]/40 via-[#fceceb]/60 to-[#fdf7f7]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#fdf7f7]/30 via-[#fceceb]/50 to-[#fdf7f7]"></div>
         </div>
 
         <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center space-y-6 relative">
 
-          {/* Subtitle with Smooth Slide Down */}
           <div className="overflow-hidden">
             <p className="text-xs md:text-sm text-[#a35d58] tracking-[0.35em] uppercase font-semibold transform transition-all duration-1000 animate-fade-in-down drop-shadow-sm bg-white/50 px-4 py-1.5 rounded-full backdrop-blur-sm">
               Handcrafted in Mumbai
             </p>
           </div>
 
-          {/* Main Title with Elegant Fade & Subtle Scale */}
           <div className="overflow-hidden">
             <h1 className="text-6xl md:text-8xl font-serif text-[#4a2c2a] leading-tight transform transition-all duration-1000 animate-fade-in-up drop-shadow-md">
               Handmade <br />
@@ -151,12 +180,10 @@ export default function HomePage() {
             </h1>
           </div>
 
-          {/* Description with Soft Fade */}
-          <p className="text-base md:text-lg text-[#6b4441] max-w-xl mx-auto leading-relaxed font-medium pt-2 animate-fade-in delay-200 drop-shadow-sm p-3 sm:p-2 rounded-xl sm:rounded-lg backdrop-blur-sm">
+          <p className="text-base md:text-lg text-[#6b4441] max-w-xl mx-auto leading-relaxed font-medium pt-2 animate-fade-in delay-200 drop-shadow-sm bg-white/40 p-3 sm:p-2 rounded-xl sm:rounded-lg backdrop-blur-sm">
             Discover our premium collection of crochet artistry, bespoke gifts, and elegant home decor. Stitched meticulously for your special moments.
           </p>
 
-          {/* Luxury Hover Button with Smooth Shadow Lift */}
           <div className="pt-6 animate-fade-in delay-300">
             <Link
               href="#products"
@@ -175,18 +202,64 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="products" className="py-32 px-6 md:px-12 w-full bg-white relative">
+      {/* 🛍️ PRODUCTS SECTION WITH LIVE FILTER & DYNAMIC COUNTS IN BUTTONS */}
+      <section id="products" className="py-24 px-4 sm:px-6 md:px-12 w-full bg-white relative z-20">
         <div className="w-full max-w-7xl mx-auto">
+          
           <div className="text-center mb-16 w-full flex flex-col items-center">
             <h2 className="text-4xl md:text-5xl font-serif text-[#4a2c2a] mb-4">Our Signature Collection</h2>
-            <div className="w-16 h-[1px] bg-[#a35d58] mx-auto mb-10 transition-all duration-500 hover:w-28"></div>
+            <div className="w-16 h-[1.5px] bg-[#a35d58] mx-auto mb-10 transition-all duration-500 hover:w-28"></div>
+
+            {/* 🔍 SEARCH BAR & FILTERS WITH INLINE COUNTS */}
+            <div className="w-full max-w-2xl mx-auto flex flex-col gap-5 mt-2">
+              
+              <div className="relative w-full max-w-sm mx-auto">
+                <input
+                  type="text"
+                  placeholder="Search collections..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-10 py-2.5 bg-[#fdf7f7] border border-[#eed6d3] focus:border-[#a35d58] rounded-full text-sm text-[#4a2c2a] placeholder-[#a35d58]/60 outline-none shadow-sm transition-all"
+                />
+                <svg className="w-4 h-4 text-[#a35d58] absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#a35d58] hover:text-[#4a2c2a] font-bold">
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+                {categories.map((cat) => {
+                  const count = getCategoryCount(cat);
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        setActiveCategory(cat);
+                        setVisibleCount(6);
+                      }}
+                      className={`px-4 py-1.5 rounded-full text-[10px] sm:text-[11px] tracking-widest uppercase transition-all duration-300 ${
+                        activeCategory === cat
+                          ? "bg-[#4a2c2a] text-white font-bold shadow-md"
+                          : "bg-transparent text-[#6b4441] border border-[#eed6d3] hover:border-[#a35d58] hover:text-[#4a2c2a]"
+                      }`}
+                    >
+                      {cat} <span className={activeCategory === cat ? "opacity-80 ml-0.5" : "opacity-60 ml-0.5"}>({count})</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
-          {/* SKELETON LOADING EFFECT */}
+          {/* SKELETON LOADING */}
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full mt-8">
               {[1, 2, 3, 4, 5, 6].map((n) => (
-                <div key={n} className="bg-white p-3 sm:p-6 border border-[#f5e1df] flex flex-col animate-pulse rounded-xl">
+                <div key={n} className="bg-white p-3 sm:p-5 border border-[#f5e1df] flex flex-col animate-pulse rounded-xl">
                   <div className="w-full h-44 sm:h-80 bg-[#fceceb]/40 mb-4 sm:mb-8 rounded-lg"></div>
                   <div className="h-6 bg-[#fceceb]/50 rounded w-3/4 mx-auto mb-3"></div>
                   <div className="h-4 bg-[#fceceb]/40 rounded w-5/6 mx-auto mb-6"></div>
@@ -194,15 +267,23 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-          ) : products.length === 0 ? (
-            <div className="text-center text-[#6b4441] my-20 italic">Products coming soon...</div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center text-[#6b4441] my-20 italic p-10 bg-[#fdf7f7] rounded-xl border border-[#eed6d3] max-w-lg mx-auto shadow-sm">
+              <span className="text-3xl block mb-3">🧶</span>
+              <p>No products found for your search.</p>
+              <button 
+                onClick={() => {setSearchQuery(""); setActiveCategory("All");}} 
+                className="mt-4 text-[#a35d58] underline text-sm font-bold uppercase tracking-widest hover:text-[#4a2c2a]"
+              >
+                Clear Filters
+              </button>
+            </div>
           ) : (
             <div className="flex flex-col items-center w-full mt-10">
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
-                {products.slice(0, visibleCount).map((product) => (
+                {filteredProducts.slice(0, visibleCount).map((product) => (
                   <div key={product._id} className="group bg-white rounded-xl p-3 sm:p-5 shadow-sm hover:shadow-xl transition-all duration-500 border border-[#f5e1df] flex flex-col hover:-translate-y-1.5">
 
-                    {/* Image Container */}
                     <div
                       onClick={() => openProductDetails(product)}
                       className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-3 sm:mb-5 relative overflow-hidden rounded-lg flex items-center justify-center group-hover:bg-[#fceceb] transition-all duration-500 cursor-pointer"
@@ -216,14 +297,13 @@ export default function HomePage() {
 
                       {/* Multiple Images Count Badge */}
                       {product.images && product.images.length > 1 && (
-                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/90 backdrop-blur-md text-[10px] sm:text-xs font-bold text-[#4a2c2a] px-2 py-0.5 sm:py-1 rounded-full flex gap-1 items-center shadow-sm">
+                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-white/90 backdrop-blur-md text-[10px] sm:text-xs font-bold text-[#4a2c2a] px-2 py-0.5 sm:py-1 rounded-full flex gap-1 items-center shadow-sm z-10">
                           <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                           {product.images.length}
                         </div>
                       )}
                     </div>
 
-                    {/* Text & Price Container */}
                     <div className="text-center flex-grow flex flex-col justify-between">
                       <div>
                         <h3 className="text-lg sm:text-[22px] font-serif text-[#4a2c2a] mb-2 line-clamp-1 group-hover:text-[#a35d58] transition-colors">{product.name}</h3>
@@ -232,10 +312,8 @@ export default function HomePage() {
                       
                       {/* 💰 ELEGANT PRICE & BUTTON LAYOUT */}
                       <div className="w-full mt-auto">
-                        {/* Thin separator line */}
                         <div className="w-[85%] h-[1px] bg-[#f5e1df] mx-auto mb-3 sm:mb-4"></div>
                         
-                        {/* Formatted Price */}
                         {product.price && product.price.trim() !== '' && (
                           <p className="text-[14px] sm:text-[16px] font-serif text-[#6b4441] mb-3 sm:mb-4 tracking-wide">
                             {formatPrice(product.price)}
@@ -254,9 +332,10 @@ export default function HomePage() {
                 ))}
               </div>
 
-              {visibleCount < products.length && (
-                <button onClick={handleShowMore} className="mt-16 px-10 py-3.5 bg-transparent text-[#a35d58] border-2 border-[#a35d58] text-sm tracking-widest uppercase rounded-full font-bold hover:bg-[#a35d58] hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg">
-                  Show More Products
+              {/* ➕ DYNAMIC SHOW MORE BUTTON WITH EXACT REMAINING COUNT */}
+              {visibleCount < filteredProducts.length && (
+                <button onClick={handleShowMore} className="mt-16 px-10 py-3.5 bg-transparent text-[#a35d58] border-2 border-[#a35d58] text-[11px] sm:text-sm tracking-widest uppercase rounded-full font-bold hover:bg-[#a35d58] hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg flex items-center justify-center gap-2">
+                  Show More ({filteredProducts.length - visibleCount})
                 </button>
               )}
             </div>
