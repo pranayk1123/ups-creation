@@ -4,19 +4,20 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('http://localhost:3000'), // 👈 HI LINE ADD KELI AHE
   title: "UP's Creation | Handmade Crochet Artistry",
   description: "Premium handcrafted crochet accessories, bespoke gifts, and elegant home decor. Stitched with love in Mumbai.",
   icons: {
-    icon: '/logo.jpg.jpeg', // Browser tab var disnara chota logo
+    icon: '/logo.jpg.jpeg',
   },
   openGraph: {
     title: "UP's Creation | Handmade Crochet Artistry",
     description: "Premium handcrafted crochet accessories, bespoke gifts, and elegant home decor. Stitched with love in Mumbai.",
-    url: 'https://tujhi-website-link.com', // ⚠️ Tula jenvha live link milel, tenvha ithe tak
+    url: 'http://localhost:3000', // ⚠️ Live jhalyavar ithe pan link update kar
     siteName: "UP's Creation",
     images: [
       {
-        url: '/hero-bg.jpg', // WhatsApp ani Insta link share kelyavar hi photo disel
+        url: '/hero-bg.jpg', 
         width: 1200,
         height: 630,
         alt: "UP's Creation Handmade Crochet",

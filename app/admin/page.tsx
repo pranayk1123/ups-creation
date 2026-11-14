@@ -13,6 +13,16 @@ interface ProductType {
   imgPosition: string;
 }
 
+// 💰 Helper Function for Price formatting (MISSING HOTA TO ITHE ADD KELAY)
+const formatPrice = (price: string) => {
+  if (!price || price.trim() === '') return '';
+  const lowerPrice = price.toLowerCase();
+  if (lowerPrice.includes('rs') || lowerPrice.includes('₹') || lowerPrice.includes('rupee')) {
+    return price;
+  }
+  return `₹ ${price}`;
+};
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState('');
@@ -26,8 +36,13 @@ export default function AdminPage() {
   const [newProduct, setNewProduct] = useState({
     name: '', price: '', desc: '', image: '', imgPosition: 'center',
   });
+  
   const [currentImages, setCurrentImages] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  
+  // 🎛️ Live Image Preview & Slider State
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [imgPosPercent, setImgPosPercent] = useState<number>(50);
 
   useEffect(() => {
     if (sessionStorage.getItem("isAdmin") === "true") {
@@ -74,9 +89,11 @@ export default function AdminPage() {
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setSelectedFiles(Array.from(e.target.files));
+    if (e.target.files && e.target.files.length > 0) {
+      const filesArray = Array.from(e.target.files);
+      setSelectedFiles(filesArray);
       setNewProduct({ ...newProduct, image: '' }); 
+      setPreviewImage(URL.createObjectURL(filesArray[0]));
     }
   };
 
@@ -89,13 +106,40 @@ export default function AdminPage() {
       image: '',
       imgPosition: product.imgPosition || 'center',
     });
-    setCurrentImages(product.images && product.images.length > 0 ? product.images : [product.image]);
+    
+    const existingImages = product.images && product.images.length > 0 ? product.images : [product.image];
+    setCurrentImages(existingImages);
+    setPreviewImage(existingImages[0] || null);
     setSelectedFiles([]);
+    
+    let defaultPos = 50;
+    if (product.imgPosition) {
+      if (product.imgPosition === 'top') defaultPos = 0;
+      else if (product.imgPosition === 'bottom') defaultPos = 100;
+      else if (product.imgPosition.includes('%')) {
+        const match = product.imgPosition.match(/\d+/);
+        if (match) defaultPos = parseInt(match[0]);
+      }
+    }
+    setImgPosPercent(defaultPos);
     setIsFormOpen(true);
   };
 
   const handleRemoveExistingImage = (indexToRemove: number) => {
-    setCurrentImages(currentImages.filter((_, idx) => idx !== indexToRemove));
+    const updatedImages = currentImages.filter((_, idx) => idx !== indexToRemove);
+    setCurrentImages(updatedImages);
+    if (updatedImages.length > 0) setPreviewImage(updatedImages[0]);
+    else setPreviewImage(null);
+  };
+
+  const resetForm = () => {
+    setIsFormOpen(false);
+    setEditingProductId(null);
+    setNewProduct({ name: '', price: '', desc: '', image: '', imgPosition: 'center' });
+    setCurrentImages([]);
+    setSelectedFiles([]);
+    setPreviewImage(null);
+    setImgPosPercent(50);
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
@@ -125,6 +169,7 @@ export default function AdminPage() {
 
     const finalImage = uploadedUrls.length > 0 ? uploadedUrls[0] : '/logo.jpg.jpeg';
     const finalPrice = newProduct.price.trim() === '' ? ' ' : newProduct.price;
+    const finalImgPosition = `center ${imgPosPercent}%`; 
 
     try {
       const url = editingProductId ? `/api/products?id=${editingProductId}` : '/api/products';
@@ -137,17 +182,14 @@ export default function AdminPage() {
           ...newProduct, 
           price: finalPrice, 
           image: finalImage,
-          images: uploadedUrls 
+          images: uploadedUrls,
+          imgPosition: finalImgPosition
         }),
       });
 
       if (res.ok) {
         fetchProducts();
-        setIsFormOpen(false);
-        setEditingProductId(null);
-        setNewProduct({ name: '', price: '', desc: '', image: '', imgPosition: 'center' });
-        setCurrentImages([]);
-        setSelectedFiles([]);
+        resetForm();
       }
     } catch (error) {
       console.error("Error saving product:", error);
@@ -186,67 +228,117 @@ export default function AdminPage() {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 sm:mb-10 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-[#f5e1df]">
           <h1 className="text-2xl sm:text-3xl font-serif text-[#4a2c2a]">Admin Dashboard</h1>
           <div className="flex flex-wrap justify-center gap-3 w-full sm:w-auto">
-            <button onClick={() => { 
-              setEditingProductId(null);
-              setNewProduct({ name: '', price: '', desc: '', image: '', imgPosition: 'center' });
-              setCurrentImages([]);
-              setSelectedFiles([]);
-              setIsFormOpen(true); 
-            }} className="flex-1 sm:flex-none px-5 py-2.5 bg-[#a35d58] text-white rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm shadow-md hover:bg-[#4a2c2a] transition-all text-center">+ Add Product</button>
-            <button onClick={handleLogout} className="flex-1 sm:flex-none px-5 py-2.5 bg-transparent text-[#4a2c2a] border border-[#4a2c2a] rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm hover:bg-[#fceceb] transition-all text-center">Logout</button>
+            <button onClick={resetForm} className="flex-1 sm:flex-none px-6 py-2.5 bg-[#a35d58] text-white rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm shadow-md hover:bg-[#4a2c2a] transition-all text-center">
+              + Add Product
+            </button>
+            <button onClick={handleLogout} className="flex-1 sm:flex-none px-6 py-2.5 bg-transparent text-[#4a2c2a] border border-[#4a2c2a] rounded-full font-bold uppercase tracking-widest text-xs sm:text-sm hover:bg-[#fceceb] transition-all text-center">
+              Logout
+            </button>
           </div>
         </div>
 
-        {/* ADD / EDIT MODAL FORM */}
+        {/* 📝 ADD / EDIT MODAL FORM */}
         {isFormOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-            <div className="bg-[#fdf7f7] p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md w-full border border-[#f5e1df] max-h-[90vh] overflow-y-auto mt-10">
-              <h3 className="text-2xl font-serif text-[#4a2c2a] mb-6 text-center">{editingProductId ? 'Edit Creation' : 'Add New Creation'}</h3>
-              <form onSubmit={handleSaveProduct} className="flex flex-col gap-4">
-                <input type="text" placeholder="Product Name" required value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]" />
-                <input type="text" placeholder="Price (Optional)" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]" />
-                
-                {currentImages.length > 0 && (
-                  <div className="flex flex-col gap-1">
-                    <label className="text-xs text-[#6b4441] font-bold">Current Photos (Click ✕ to remove)</label>
-                    <div className="flex gap-2 flex-wrap bg-white p-2 border border-[#eed6d3] rounded-lg">
-                      {currentImages.map((imgUrl, idx) => (
-                        <div key={idx} className="relative w-14 h-14 rounded overflow-hidden border border-[#eed6d3]">
-                          <Image src={imgUrl} alt={`Current ${idx}`} fill className="object-cover" />
-                          <button 
-                            type="button" 
-                            onClick={() => handleRemoveExistingImage(idx)}
-                            className="absolute top-0 right-0 bg-red-600 text-white w-5 h-5 flex items-center justify-center text-[10px] font-bold rounded-bl"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-6">
+            <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl max-w-lg w-full border border-[#f5e1df] max-h-[92vh] overflow-y-auto">
+              
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-serif text-[#4a2c2a]">{editingProductId ? 'Edit Creation' : 'Add New Creation'}</h3>
+                <button onClick={resetForm} className="text-[#a35d58] hover:text-red-500 font-bold text-xl">✕</button>
+              </div>
 
-                <div className="flex flex-col gap-2 p-3 bg-white border border-[#eed6d3] rounded-lg">
-                  <label className="text-sm text-[#6b4441] font-bold">Add More Images</label>
-                  <input type="file" multiple accept="image/*" onChange={handleFileUpload} className="text-sm text-[#4a2c2a] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#fceceb] file:text-[#a35d58] hover:file:bg-[#eed6d3]" />
-                  <div className="text-center text-xs text-[#a35d58] my-1">OR</div>
-                  <input type="text" placeholder="Paste single Image URL here..." value={newProduct.image} onChange={(e) => { setNewProduct({...newProduct, image: e.target.value}); setSelectedFiles([]); }} className="p-2 border border-[#eed6d3] rounded text-sm outline-none focus:border-[#a35d58]" />
+              <form onSubmit={handleSaveProduct} className="flex flex-col gap-5">
+                
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-[#6b4441] uppercase tracking-wider">Product Name *</label>
+                  <input type="text" placeholder="e.g. Daisy Handcrafted Hair Clip" required value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-[#fdf7f7] outline-none focus:border-[#a35d58] text-[#4a2c2a]" />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm text-[#6b4441] font-bold">Main Image Display Adjust</label>
-                  <select value={newProduct.imgPosition} onChange={(e) => setNewProduct({...newProduct, imgPosition: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]">
-                    <option value="center">Center (Default)</option>
-                    <option value="top">Top</option>
-                    <option value="bottom">Bottom</option>
-                  </select>
+                  <label className="text-xs font-bold text-[#6b4441] uppercase tracking-wider">Price (Optional)</label>
+                  <input type="text" placeholder="e.g. 299" value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-[#fdf7f7] outline-none focus:border-[#a35d58] text-[#4a2c2a]" />
+                </div>
+                
+                {/* 📸 IMAGE UPLOAD SECTION */}
+                <div className="flex flex-col gap-3 p-4 bg-[#fdf7f7] border border-[#eed6d3] rounded-xl">
+                  <label className="text-sm text-[#4a2c2a] font-bold">Upload Photos</label>
+                  
+                  {currentImages.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {currentImages.map((imgUrl, idx) => (
+                        <div key={idx} className="relative w-14 h-14 rounded-md overflow-hidden border border-[#a35d58]/40 shadow-sm cursor-pointer" onClick={() => setPreviewImage(imgUrl)}>
+                          <Image src={imgUrl} alt={`Current ${idx}`} fill className="object-cover" />
+                          <button 
+                            type="button" 
+                            onClick={(e) => { e.stopPropagation(); handleRemoveExistingImage(idx); }}
+                            className="absolute top-0 right-0 bg-red-500 text-white w-5 h-5 flex items-center justify-center text-[10px] font-bold hover:bg-red-700"
+                          >✕</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <input type="file" multiple accept="image/*" onChange={handleFileUpload} className="text-sm text-[#4a2c2a] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-wider file:bg-[#4a2c2a] file:text-white hover:file:bg-[#a35d58] cursor-pointer" />
+                  
+                  <div className="text-center text-xs text-[#a35d58] font-bold">OR</div>
+                  
+                  <input type="text" placeholder="Paste Image URL here..." value={newProduct.image} onChange={(e) => { 
+                    setNewProduct({...newProduct, image: e.target.value}); 
+                    setSelectedFiles([]); 
+                    setPreviewImage(e.target.value); 
+                  }} className="p-2.5 border border-[#eed6d3] rounded-lg bg-white text-sm outline-none focus:border-[#a35d58]" />
                 </div>
 
-                <textarea placeholder="Short Description" required rows={3} value={newProduct.desc} onChange={(e) => setNewProduct({...newProduct, desc: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-white outline-none focus:border-[#a35d58] text-[#4a2c2a]"></textarea>
+                {/* 🎛️ LIVE IMAGE POSITION PREVIEW & ADJUSTER */}
+                <div className="flex flex-col gap-3 p-4 bg-white border border-[#eed6d3] rounded-xl shadow-sm">
+                  <div className="flex flex-col">
+                    <label className="text-sm text-[#4a2c2a] font-bold">Adjust Main Photo Display</label>
+                    <p className="text-[10px] text-[#6b4441] mt-0.5">Website var photo kasa disel te khali bagha ani slider halavun adjust kara.</p>
+                  </div>
+
+                  <div className="relative w-full h-44 sm:h-48 bg-[#fdf7f7] rounded-lg overflow-hidden border-2 border-dashed border-[#a35d58]/40 shadow-inner flex items-center justify-center">
+                    {previewImage ? (
+                      <Image
+                        src={previewImage}
+                        alt="Live Preview"
+                        fill
+                        className="object-cover"
+                        style={{ objectPosition: `center ${imgPosPercent}%` }}
+                      />
+                    ) : (
+                      <div className="text-xs text-[#a35d58]/60 font-bold flex flex-col items-center">
+                        <span className="text-2xl mb-1">🖼️</span> No image selected
+                      </div>
+                    )}
+                  </div>
+
+                  {previewImage && (
+                    <div className="flex flex-col gap-2 mt-2">
+                      <div className="flex justify-between text-[9px] font-bold text-[#a35d58] uppercase tracking-widest px-1">
+                        <span>Top (0%)</span>
+                        <span>Center (50%)</span>
+                        <span>Bottom (100%)</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={imgPosPercent}
+                        onChange={(e) => setImgPosPercent(Number(e.target.value))}
+                        className="w-full h-2 bg-[#eed6d3] rounded-lg appearance-none cursor-pointer accent-[#a35d58]"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-[#6b4441] uppercase tracking-wider">Short Description *</label>
+                  <textarea placeholder="Tell your customers about this beautiful creation..." required rows={3} value={newProduct.desc} onChange={(e) => setNewProduct({...newProduct, desc: e.target.value})} className="p-3 border border-[#eed6d3] rounded-lg bg-[#fdf7f7] outline-none focus:border-[#a35d58] text-[#4a2c2a] resize-none"></textarea>
+                </div>
                 
-                <div className="flex gap-4 mt-4">
-                  <button type="button" onClick={() => { setIsFormOpen(false); setSelectedFiles([]); }} className="flex-1 py-3 text-[#4a2c2a] border border-[#4a2c2a] rounded-lg font-bold hover:bg-[#fceceb]">Cancel</button>
-                  <button type="submit" className="flex-1 py-3 text-white bg-[#a35d58] rounded-lg font-bold hover:bg-[#4a2c2a]">Save Product</button>
+                <div className="flex gap-4 mt-2">
+                  <button type="button" onClick={resetForm} className="flex-1 py-3.5 text-[#4a2c2a] bg-[#fdf7f7] border border-[#eed6d3] rounded-xl font-bold hover:bg-[#fceceb] hover:border-[#a35d58] transition-colors uppercase tracking-widest text-xs">Cancel</button>
+                  <button type="submit" className="flex-1 py-3.5 text-white bg-[#a35d58] rounded-xl font-bold hover:bg-[#4a2c2a] transition-colors uppercase tracking-widest text-xs shadow-md">Save Creation</button>
                 </div>
               </form>
             </div>
@@ -255,7 +347,13 @@ export default function AdminPage() {
         
         {/* 📱 2-COLUMN GRID FOR MOBILE, 3-COLUMN FOR DESKTOP */}
         {isLoading ? (
-          <div className="text-center text-[#a35d58] font-bold my-20">Loading products...</div>
+          <div className="text-center text-[#a35d58] font-bold my-20 animate-pulse text-lg tracking-widest uppercase">Loading creations...</div>
+        ) : products.length === 0 ? (
+          <div className="text-center bg-white p-10 rounded-2xl border border-[#f5e1df] max-w-lg mx-auto mt-10 shadow-sm">
+            <p className="text-3xl mb-3">🧶</p>
+            <p className="text-[#4a2c2a] font-serif text-lg">No products added yet.</p>
+            <p className="text-sm text-[#6b4441] mt-1">Click '+ Add Product' to build your collection.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 w-full">
             {products.map((product) => (
@@ -268,34 +366,33 @@ export default function AdminPage() {
   );
 }
 
-// 📱 Admin Product Card (Optimized for Mobile Grid)
+// 📱 Admin Product Card
 function AdminProductCard({ product, handleDeleteProduct, handleOpenEdit }: { product: ProductType, handleDeleteProduct: (id: string) => void, handleOpenEdit: (p: ProductType) => void }) {
-  const [activeImage, setActiveImage] = useState(product.image || "/logo.jpg.jpeg");
+  const [activeImage, setActiveImage] = useState(product.images?.[0] || product.image || "/logo.jpg.jpeg");
 
   return (
-    <div className="group bg-white rounded-none p-3 sm:p-6 shadow-sm hover:shadow-2xl transition-all duration-500 border border-[#f5e1df] flex flex-col relative">
-      <div className="absolute top-2 right-2 flex gap-1.5 z-20">
-        <button onClick={() => handleOpenEdit(product)} className="w-7 h-7 sm:w-8 sm:h-8 bg-[#4a2c2a] text-white rounded-full flex items-center justify-center sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-[#a35d58] shadow-md text-xs" title="Edit Product">
+    <div className="group bg-white rounded-2xl p-3 sm:p-5 shadow-sm hover:shadow-xl transition-all duration-500 border border-[#f5e1df] flex flex-col relative overflow-hidden">
+      
+      <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex gap-2 z-20">
+        <button onClick={() => handleOpenEdit(product)} className="w-8 h-8 sm:w-9 sm:h-9 bg-white/90 backdrop-blur text-[#4a2c2a] border border-[#eed6d3] rounded-full flex items-center justify-center transition-all duration-300 hover:bg-[#4a2c2a] hover:text-white hover:border-transparent shadow-sm text-sm" title="Edit Product">
           ✎
         </button>
-        <button onClick={() => handleDeleteProduct(product._id)} className="w-7 h-7 sm:w-8 sm:h-8 bg-red-500/90 text-white rounded-full flex items-center justify-center sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-600 shadow-md text-xs" title="Delete Product">
+        <button onClick={() => handleDeleteProduct(product._id)} className="w-8 h-8 sm:w-9 sm:h-9 bg-white/90 backdrop-blur text-red-500 border border-[#eed6d3] rounded-full flex items-center justify-center transition-all duration-300 hover:bg-red-500 hover:text-white hover:border-transparent shadow-sm text-sm font-bold" title="Delete Product">
           ✕
         </button>
       </div>
       
-      {/* Main Image */}
-      <div className="w-full h-44 sm:h-80 bg-[#fdf7f7] mb-3 sm:mb-4 relative overflow-hidden flex items-center justify-center group-hover:bg-[#fceceb] transition-colors duration-500">
+      <div className="w-full h-44 sm:h-64 bg-[#fdf7f7] mb-3 sm:mb-4 relative overflow-hidden rounded-xl flex items-center justify-center border border-[#f5e1df]">
         <Image src={activeImage} alt={product.name} fill sizes="(max-width: 768px) 50vw, 33vw" style={{ objectFit: "cover", objectPosition: product.imgPosition || "center" }} className="transition-transform duration-500 group-hover:scale-105" />  
       </div>
 
-      {/* Thumbnails */}
       {product.images && product.images.length > 1 && (
         <div className="flex gap-1.5 sm:gap-2 mb-3 sm:mb-4 overflow-x-auto pb-1 scrollbar-thin">
           {product.images.map((imgUrl, i) => (
             <div 
               key={i} 
               onClick={() => setActiveImage(imgUrl)}
-              className={`relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded border-2 overflow-hidden bg-[#fdf7f7] cursor-pointer transition-all ${activeImage === imgUrl ? 'border-[#a35d58] scale-105 shadow-md' : 'border-[#eed6d3] opacity-70 hover:opacity-100'}`}
+              className={`relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-lg border-2 overflow-hidden bg-[#fdf7f7] cursor-pointer transition-all ${activeImage === imgUrl ? 'border-[#a35d58] scale-105 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
             >
               <Image src={imgUrl} alt={`Thumb ${i}`} fill className="object-cover" />
             </div>
@@ -303,10 +400,16 @@ function AdminProductCard({ product, handleDeleteProduct, handleOpenEdit }: { pr
         </div>
       )}
 
-      <div className="text-center flex-grow">
-        <h3 className="text-base sm:text-2xl font-serif text-[#4a2c2a] mb-1 line-clamp-1">{product.name}</h3>
-        <span className="text-sm sm:text-xl font-serif text-[#a35d58]">{product.price || 'No Price'}</span>
-        <p className="text-[10px] sm:text-xs text-gray-400 mt-1 sm:mt-2 font-bold">{product.images && product.images.length > 1 ? `${product.images.length} Photos` : '1 Photo'}</p>
+      <div className="text-center flex-grow flex flex-col justify-between">
+        <div>
+          <h3 className="text-base sm:text-xl font-serif text-[#4a2c2a] mb-1 line-clamp-1">{product.name}</h3>
+          {product.price && product.price.trim() !== '' && (
+            <span className="text-sm sm:text-lg font-medium text-[#8c4f4a] tracking-wide">{formatPrice(product.price)}</span>
+          )}
+        </div>
+        <p className="text-[10px] sm:text-xs text-[#a35d58] mt-3 font-bold uppercase tracking-widest bg-[#fceceb] inline-block px-3 py-1 rounded-full mx-auto">
+          {product.images && product.images.length > 1 ? `${product.images.length} Photos` : '1 Photo'}
+        </p>
       </div>
     </div>
   );
