@@ -63,10 +63,16 @@ export default function HomePage() {
     if (selectedProduct) {
       window.history.pushState({ modalOpen: true }, '');
       window.addEventListener('popstate', handlePopState);
+      // Lock background scroll
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Unlock background scroll when closed
+      document.body.style.overflow = 'unset';
     }
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
+      document.body.style.overflow = 'unset';
     };
   }, [selectedProduct]);
 
@@ -150,7 +156,6 @@ export default function HomePage() {
     <div className="overflow-hidden w-full relative selection:bg-[#fceceb] selection:text-[#a35d58]">
       
       {/* 🌟 HERO SECTION */}
-{/* 🌟 HERO SECTION */}
       <section className="relative flex flex-col items-center justify-center min-h-screen w-full px-4 text-center bg-[#fdf7f7] overflow-hidden">
         
         <div className="absolute inset-0 z-0">
@@ -159,17 +164,17 @@ export default function HomePage() {
             alt="Handmade Crochet Background"
             fill
             priority
-            // Fixed for Mobile: use object-cover so it scales properly without stretching, 
-            // and object-center to keep the main content (thread/needles) in view.
-            className="object-cover object-center opacity-80 mix-blend-multiply brightness-90 grayscale-[10%]" 
+            // Made it significantly darker using brightness-50 and contrast-125
+            className="object-cover object-center opacity-100 brightness-100 contrast-125 grayscale-[10%]" 
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#fdf7f7]/30 via-[#fceceb]/50 to-[#fdf7f7]"></div>
+          {/* Subtle dark tint fading to bottom color */}
+          <div className="absolute inset-0 bg-black/10 bg-gradient-to-b from-transparent via-[#fdf7f7]/20 to-[#fdf7f7]"></div>
         </div>
 
         <div className="z-10 w-full max-w-4xl mx-auto flex flex-col items-center justify-center space-y-6 relative">
 
           <div className="overflow-hidden">
-            <p className="text-xs md:text-sm text-[#a35d58] tracking-[0.35em] uppercase font-semibold transform transition-all duration-1000 animate-fade-in-down drop-shadow-sm bg-white/50 px-4 py-1.5 rounded-full backdrop-blur-sm border border-white/40">
+            <p className="text-xs md:text-sm text-[#a35d58] tracking-[0.35em] uppercase font-semibold transform transition-all duration-1000 animate-fade-in-down drop-shadow-md bg-white/20 px-4 py-1 rounded-full backdrop-blur-sm">
               Handcrafted in Mumbai
             </p>
           </div>
@@ -183,7 +188,6 @@ export default function HomePage() {
             </h1>
           </div>
 
-          {/* Removed bg-white/40 and padding blocks to make it fully transparent */}
           <p className="text-base md:text-lg text-[#6b4441] max-w-xl mx-auto leading-relaxed font-medium pt-2 animate-fade-in delay-200 drop-shadow-md px-4">
             Discover our premium collection of crochet artistry, bespoke gifts, and elegant home decor. Stitched meticulously for your special moments.
           </p>
@@ -404,7 +408,7 @@ export default function HomePage() {
             </div>
 
             {/* Right Details */}
-            <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col bg-white md:overflow-y-auto md:max-h-[92vh]">
+            <div className="w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col bg-white overflow-y-auto max-h-[92vh]">
               <div className="mb-4">
                 <p className="text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase text-[#a35d58] mb-1 sm:mb-2">UP's Creation</p>
                 <h2 className="text-2xl sm:text-4xl md:text-5xl font-serif text-[#4a2c2a] mb-2 sm:mb-3 leading-tight">{selectedProduct.name}</h2>
